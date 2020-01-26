@@ -19,6 +19,11 @@ repositories {
 
 dependencies {
     implementation(group = "net.dv8tion", name = "JDA", version = "4.1.1_101")
+
+    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
+    implementation(group = "org.jscience", name = "jscience", version = "4.3.1")
+
+
 }
 
 configure<JavaPluginConvention> {
