@@ -1,73 +1,60 @@
 package me.duncte123.hirobot;
 
-import java.util.List;
+import javax.measure.Measure;
+import javax.measure.converter.UnitConverter;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Quantity;
+import javax.measure.quantity.Temperature;
+import javax.measure.unit.Unit;
+
+import static javax.measure.unit.NonSI.*;
+import static javax.measure.unit.SI.*;
 
 public class ConvertHelpers {
 
-
-    public static enum Unit {
-        FAHRENHEIT("f", "F"),
-        KELVIN("k", "K"),
-        CELSIUS("c", "C"),
-        ;
-
-        private final List<String> keys;
-
-        Unit(final String... keys) {
-            this.keys = List.of(keys);
-        }
-
-        /*
-           KELVIN.toCelsius(5) === this == kelvin
-           CELSIUS.toCelsius(5) === this == celsius
-         */
-        public float toCelsius(final float input) {
-            switch (this) {
-                case FAHRENHEIT:
-                    return 0;
-                case KELVIN:
-                    return toKelvin(input, this);
-                case CELSIUS:
-                    return input;
-                default:
-                    throw new IllegalArgumentException("Input was not a temperature unit");
-            }
-        }
-
-        private float toKelvin(final float input, final Unit from) {
-            switch (from) {
-                case CELSIUS:
-                    return input + 273.15f;
-                case FAHRENHEIT:
-                    return (input - 32) * 5/9 + 273.15f;
-                case KELVIN:
-                    return input;
-                default:
-                    throw new IllegalArgumentException("Input was not a temperature unit");
-            }
-        }
-
-        private float toFahrenheit(final float input, final Unit from) {
-            switch (from) {
-                case CELSIUS:
-                    return input + 273.15f;
-                case FAHRENHEIT:
-                    return input;
-                case KELVIN:
-                    return input;
-                default:
-                    throw new IllegalArgumentException("Input was not a temperature unit");
-            }
-        }
-
-        public static Unit fromKey(final String key) {
-            for (Unit value : values()) {
-                if (value.keys.contains(key)) {
-                    return value;
-                }
-            }
-
-            return null;
-        }
+    public static double toCelsius(double input, Unit<Temperature> inputUnit) {
+        return convertTemperature(input, inputUnit, CELSIUS);
     }
+
+    public static double toFahrenheit(double input, Unit<Temperature> inputUnit) {
+        return convertTemperature(input, inputUnit, FAHRENHEIT);
+    }
+
+    public static double toKelvin(double input, Unit<Temperature> inputUnit) {
+        return convertTemperature(input, inputUnit, KELVIN);
+    }
+
+    public static double toKilometer(double input, Unit<Length> inputUnit) {
+        return convertLength(input, inputUnit, KILOMETER);
+    }
+
+    public static double toMeter(double input, Unit<Length> inputUnit) {
+        return convertLength(input, inputUnit, METER);
+    }
+
+    public static double toMile(double input, Unit<Length> inputUnit) {
+        return convertLength(input, inputUnit, MILE);
+    }
+
+    private static double convertTemperature(double input, Unit<Temperature> sourceUnit, Unit<Temperature> targetUnit) {
+        final UnitConverter converter = sourceUnit.getConverterTo(targetUnit);
+        final double measure = Measure.valueOf(input, sourceUnit).doubleValue(sourceUnit);
+
+        return converter.convert(measure);
+    }
+
+    private static double convertLength(double input, Unit<Length> sourceUnit, Unit<Length> targetUnit) {
+        final UnitConverter converter = sourceUnit.getConverterTo(targetUnit);
+        final double measure = Measure.valueOf(input, sourceUnit).doubleValue(sourceUnit);
+
+        return converter.convert(measure);
+    }
+
+    private static double convert(double input, Unit<? extends Quantity> sourceUnit, Unit<? extends Quantity> targetUnit) {
+        final UnitConverter converter = sourceUnit.getConverterTo(targetUnit);
+        final double measure = Measure.valueOf(input, sourceUnit).doubleValue(sourceUnit);
+
+        return converter.convert(measure);
+    }
+
 }

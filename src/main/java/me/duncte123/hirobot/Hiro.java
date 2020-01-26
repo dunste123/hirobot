@@ -2,10 +2,7 @@ package me.duncte123.hirobot;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -16,16 +13,17 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
+import java.util.Objects;
 
-import javax.measure.Measure;
-import javax.measure.converter.UnitConverter;
-import javax.measure.quantity.Length;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
+import static me.duncte123.hirobot.ConvertHelpers.toCelsius;
 
 public class Hiro implements EventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Hiro.class);
     private static final long OWNER_ID = 311769499995209728L;
+    private static final long FAN_GUILD_ID = 670218976932134922L;
+    private static final long STANS_ROLE_ID = 670368434017533962L;
     private static final String PREFIX = "-";
     private static final String DEGREE_SIGN = "\u00B0";
 
@@ -63,7 +61,16 @@ public class Hiro implements EventListener {
     }
 
     private void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        //
+        final Guild guild = event.getGuild();
+
+        if (guild.getIdLong() != FAN_GUILD_ID) {
+            return;
+        }
+
+        final Role stansRole = Objects.requireNonNull(guild.getRoleById(STANS_ROLE_ID));
+        final Member member = event.getMember();
+
+        guild.addRoleToMember(member, stansRole).queue();
     }
 
     private void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
@@ -81,11 +88,8 @@ public class Hiro implements EventListener {
         }
 
         if (contentRaw.startsWith(PREFIX + "cvt")) {
-            int fahrenheit = 100;
-
-            final UnitConverter fahrenheitToCelsius = FAHRENHEIT.getConverterTo(CELSIUS);
-            final double measure = Measure.valueOf(fahrenheit, FAHRENHEIT).doubleValue(FAHRENHEIT);
-            final double celsius = fahrenheitToCelsius.convert(measure);
+            double fahrenheit = 100;
+            final double celsius = toCelsius(fahrenheit, FAHRENHEIT);
 
             channel.sendMessageFormat(
                     "TEST: %d%sf is %f%sc",
