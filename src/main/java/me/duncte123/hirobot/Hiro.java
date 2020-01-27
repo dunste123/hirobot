@@ -8,15 +8,17 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
+import java.util.EnumSet;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
-import static javax.measure.unit.NonSI.*;
-import static javax.measure.unit.SI.*;
+import static javax.measure.unit.NonSI.FAHRENHEIT;
 import static me.duncte123.hirobot.ConvertHelpers.toCelsius;
 
 public class Hiro implements EventListener {
@@ -24,26 +26,22 @@ public class Hiro implements EventListener {
     private static final long OWNER_ID = 311769499995209728L;
     private static final long FAN_GUILD_ID = 670218976932134922L;
     private static final long STANS_ROLE_ID = 670368434017533962L;
+    private static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     private static final String PREFIX = "-";
     private static final String DEGREE_SIGN = "\u00B0";
+    private static final String[] WELCOME_MESSAGES = {
+            "Hey what's up {user}, welcome to my fanclub <:HiroCheer:670239465259794442>"
+    };
 
 
     public Hiro(String token) throws LoginException {
         new JDABuilder()
                 .setToken(token)
                 .addEventListeners(this)
+                .setEnabledCacheFlags(EnumSet.noneOf(CacheFlag.class))
                 .setActivity(Activity.playing("with Keitaro"))
                 .build();
     }
-
-    public static void main(String[] args) throws LoginException {
-        if (args.length == 0) {
-            throw new IllegalArgumentException("Haha yes this code wants token");
-        }
-
-        new Hiro(args[0]);
-    }
-
 
     @Override
     public void onEvent(@Nonnull GenericEvent event) {
@@ -69,6 +67,14 @@ public class Hiro implements EventListener {
 
         final Role stansRole = Objects.requireNonNull(guild.getRoleById(STANS_ROLE_ID));
         final Member member = event.getMember();
+
+        Objects.requireNonNull(
+                guild.getTextChannelById(GENERAL_CHANNEL_ID)
+        ).sendMessage(
+                WELCOME_MESSAGES[
+                        ThreadLocalRandom.current().nextInt(WELCOME_MESSAGES.length)
+                ].replace("{user}", member.getUser().getAsMention())
+        ).queue();
 
         guild.addRoleToMember(member, stansRole).queue();
     }
@@ -100,5 +106,13 @@ public class Hiro implements EventListener {
             ).queue();
         }
 
+    }
+
+    public static void main(String[] args) throws LoginException {
+        if (args.length == 0) {
+            throw new IllegalArgumentException("Haha yes this code wants token");
+        }
+
+        new Hiro(args[0]);
     }
 }

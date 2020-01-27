@@ -7,36 +7,37 @@ import javax.measure.quantity.Quantity;
 import javax.measure.quantity.Temperature;
 import javax.measure.unit.Unit;
 
-import static javax.measure.unit.NonSI.*;
+import static javax.measure.unit.NonSI.FAHRENHEIT;
+import static javax.measure.unit.NonSI.MILE;
 import static javax.measure.unit.SI.*;
 
 public class ConvertHelpers {
 
     public static double toCelsius(double input, Unit<Temperature> inputUnit) {
-        return convertTemperature(input, inputUnit, CELSIUS);
+        return convert(input, inputUnit, CELSIUS);
     }
 
     public static double toFahrenheit(double input, Unit<Temperature> inputUnit) {
-        return convertTemperature(input, inputUnit, FAHRENHEIT);
+        return convert(input, inputUnit, FAHRENHEIT);
     }
 
     public static double toKelvin(double input, Unit<Temperature> inputUnit) {
-        return convertTemperature(input, inputUnit, KELVIN);
+        return convert(input, inputUnit, KELVIN);
     }
 
     public static double toKilometer(double input, Unit<Length> inputUnit) {
-        return convertLength(input, inputUnit, KILOMETER);
+        return convert(input, inputUnit, KILOMETER);
     }
 
     public static double toMeter(double input, Unit<Length> inputUnit) {
-        return convertLength(input, inputUnit, METER);
+        return convert(input, inputUnit, METER);
     }
 
     public static double toMile(double input, Unit<Length> inputUnit) {
-        return convertLength(input, inputUnit, MILE);
+        return convert(input, inputUnit, MILE);
     }
 
-    private static double convertTemperature(double input, Unit<Temperature> sourceUnit, Unit<Temperature> targetUnit) {
+    /*private static double convertTemperature(double input, Unit<Temperature> sourceUnit, Unit<Temperature> targetUnit) {
         final UnitConverter converter = sourceUnit.getConverterTo(targetUnit);
         final double measure = Measure.valueOf(input, sourceUnit).doubleValue(sourceUnit);
 
@@ -48,11 +49,13 @@ public class ConvertHelpers {
         final double measure = Measure.valueOf(input, sourceUnit).doubleValue(sourceUnit);
 
         return converter.convert(measure);
-    }
+    }*/
 
+    @SuppressWarnings("unchecked")
     private static double convert(double input, Unit<? extends Quantity> sourceUnit, Unit<? extends Quantity> targetUnit) {
         final UnitConverter converter = sourceUnit.getConverterTo(targetUnit);
-        final double measure = Measure.valueOf(input, sourceUnit).doubleValue(sourceUnit);
+        final Unit<Quantity> wtfJava = (Unit<Quantity>) sourceUnit;
+        final double measure = Measure.valueOf(input, wtfJava).doubleValue(wtfJava);
 
         return converter.convert(measure);
     }
