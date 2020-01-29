@@ -1,5 +1,6 @@
 package me.duncte123.hirobot;
 
+import javax.annotation.Nullable;
 import javax.measure.Measure;
 import javax.measure.converter.UnitConverter;
 import javax.measure.quantity.Length;
@@ -7,11 +8,65 @@ import javax.measure.quantity.Quantity;
 import javax.measure.quantity.Temperature;
 import javax.measure.unit.Unit;
 
-import static javax.measure.unit.NonSI.FAHRENHEIT;
-import static javax.measure.unit.NonSI.MILE;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+
+import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
 public class ConvertHelpers {
+    public static final Map<String, BiFunction<Double, Unit, Double>> UNIT_MAP = new HashMap<>();
+
+    static {
+        UNIT_MAP.put("c", ConvertHelpers::toCelsius);
+        UNIT_MAP.put("f", ConvertHelpers::toFahrenheit);
+        UNIT_MAP.put("k", ConvertHelpers::toKelvin);
+
+        UNIT_MAP.put("km", ConvertHelpers::toKilometer);
+        UNIT_MAP.put("m", ConvertHelpers::toMeter);
+        UNIT_MAP.put("cm", ConvertHelpers::toCentimeter);
+        UNIT_MAP.put("i", ConvertHelpers::toInch);
+        UNIT_MAP.put("ft", ConvertHelpers::toFoot);
+        UNIT_MAP.put("mi", ConvertHelpers::toMile);
+    }
+
+    public static BiFunction<Double, Unit, Double> getConvertMethod(String unit) {
+        if (UNIT_MAP.containsKey(unit)) {
+            return UNIT_MAP.get(unit);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static Unit<? extends Quantity> getUnitForInput(String inputUnit) {
+        switch(inputUnit.toLowerCase()) {
+            case "k":
+                return KELVIN;
+            case "c":
+                return CELSIUS;
+            case "f":
+                return FAHRENHEIT;
+
+            case "km":
+                return KILOMETER;
+            case "m":
+                return METER;
+            case "cm":
+                return CENTIMETER;
+            case "in":
+                return INCH;
+            case "ft":
+                return FOOT;
+            case "mi":
+                return MILE;
+
+            default:
+                return null;
+        }
+    }
+
 
     public static double toCelsius(double input, Unit<Temperature> inputUnit) {
         return convert(input, inputUnit, CELSIUS);
@@ -33,8 +88,20 @@ public class ConvertHelpers {
         return convert(input, inputUnit, METER);
     }
 
+    public static double toCentimeter(double input, Unit<Length> inputUnit) {
+        return convert(input, inputUnit, CENTIMETER);
+    }
+
+    public static double toFoot(double input, Unit<Length> inputUnit) {
+        return convert(input, inputUnit, FOOT);
+    }
+
     public static double toMile(double input, Unit<Length> inputUnit) {
         return convert(input, inputUnit, MILE);
+    }
+
+    public static double toInch(double input, Unit<Length> inputUnit) {
+        return convert(input, inputUnit, INCH);
     }
 
     /*private static double convertTemperature(double input, Unit<Temperature> sourceUnit, Unit<Temperature> targetUnit) {

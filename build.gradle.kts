@@ -26,6 +26,12 @@ dependencies {
 
 }
 
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+    options.isIncremental = true
+    options.compilerArgs = listOf("-Xlint:deprecation", "-Xlint:unchecked")
+}
+
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_11
 }
