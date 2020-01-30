@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
@@ -24,7 +25,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static me.duncte123.hirobot.ConvertHelpers.*;
+import static me.duncte123.hirobot.ConvertHelpers.getConvertMethod;
+import static me.duncte123.hirobot.ConvertHelpers.getUnitForInput;
 
 public class Hiro implements EventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Hiro.class);
@@ -63,11 +65,26 @@ public class Hiro implements EventListener {
             this.onGuildMemberJoin((GuildMemberJoinEvent) event);
         } else if (event instanceof GuildMessageReceivedEvent) {
             this.onGuildMessageReceived((GuildMessageReceivedEvent) event);
+        } else if (event instanceof GuildMessageReactionAddEvent) {
+            this.onGuildMessageReactionAdd((GuildMessageReactionAddEvent) event);
         }
     }
 
     private void onReady(@Nonnull ReadyEvent event) {
         LOGGER.info("Logged in as {}", event.getJDA().getSelfUser().getAsTag());
+    }
+
+    private void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
+        final Guild guild = event.getGuild();
+
+        if (guild.getIdLong() != FAN_GUILD_ID) {
+            return;
+        }
+
+        final Member member = event.getMember();
+        final long emoteId = event.getReactionEmote().getIdLong();
+
+        ReactionHelpers.applyRole(emoteId, member);
     }
 
     private void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
