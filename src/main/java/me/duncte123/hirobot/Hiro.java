@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
@@ -67,6 +68,8 @@ public class Hiro implements EventListener {
             this.onGuildMessageReceived((GuildMessageReceivedEvent) event);
         } else if (event instanceof GuildMessageReactionAddEvent) {
             this.onGuildMessageReactionAdd((GuildMessageReactionAddEvent) event);
+        } else if (event instanceof GuildMessageReactionRemoveEvent) {
+            this.onGuildMessageReactionRemove((GuildMessageReactionRemoveEvent) event);
         }
     }
 
@@ -85,6 +88,19 @@ public class Hiro implements EventListener {
         final long emoteId = event.getReactionEmote().getIdLong();
 
         ReactionHelpers.applyRole(emoteId, member);
+    }
+
+    private void onGuildMessageReactionRemove(@Nonnull GuildMessageReactionRemoveEvent event) {
+        final Guild guild = event.getGuild();
+
+        if (guild.getIdLong() != FAN_GUILD_ID) {
+            return;
+        }
+
+        final Member member = event.getMember();
+        final long emoteId = event.getReactionEmote().getIdLong();
+
+        ReactionHelpers.removeRole(emoteId, member);
     }
 
     private void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
