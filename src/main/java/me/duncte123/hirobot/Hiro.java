@@ -1,5 +1,9 @@
 package me.duncte123.hirobot;
 
+import com.jagrosh.jdautilities.command.CommandClient;
+import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import me.duncte123.hirobot.commands.CVTCommand;
+import me.duncte123.hirobot.commands.RouteCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -15,28 +19,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.measure.converter.ConversionException;
-import javax.measure.quantity.Quantity;
-import javax.measure.unit.Unit;
 import javax.security.auth.login.LoginException;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static me.duncte123.hirobot.ConvertHelpers.getConvertMethod;
-import static me.duncte123.hirobot.ConvertHelpers.getUnitForInput;
 
 public class Hiro implements EventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(Hiro.class);
-    private static final Pattern INPUT_PATTERN = Pattern.compile("(\\d+)(\\D{1,2})");
     private static final long OWNER_ID = 311769499995209728L;
     private static final long FAN_GUILD_ID = 670218976932134922L;
     private static final long STANS_ROLE_ID = 670368434017533962L;
     private static final long GENERAL_CHANNEL_ID = 670218976932134925L;
-    private static final String PREFIX = "-";
+    public static final String PREFIX = "-";
 //    private static final String DEGREE_SIGN = "\u00B0";
     private static final String[] WELCOME_MESSAGES = {
             "Hey what's up {user}, welcome to my fanclub <:HiroCheer:670239465259794442>",
@@ -50,11 +44,24 @@ public class Hiro implements EventListener {
 
 
     public Hiro(String token) throws LoginException {
+
+        final CommandClientBuilder builder = new CommandClientBuilder();
+
+        builder.setPrefix(PREFIX);
+        builder.setActivity(Activity.playing("with Keitaro"));
+        builder.setOwnerId(String.valueOf(OWNER_ID));
+
+        builder.addCommands(
+                new CVTCommand(),
+                new RouteCommand()
+        );
+
+        final CommandClient commandClient = builder.build();
+
         new JDABuilder()
                 .setToken(token)
-                .addEventListeners(this)
+                .addEventListeners(this, commandClient)
                 .setEnabledCacheFlags(EnumSet.noneOf(CacheFlag.class))
-                .setActivity(Activity.playing("with Keitaro"))
                 .build();
     }
 
@@ -125,7 +132,6 @@ public class Hiro implements EventListener {
 
     private void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         final Message message = event.getMessage();
-        final TextChannel channel = event.getChannel();
         final String contentRaw = message.getContentRaw();
         final User author = message.getAuthor();
 
@@ -134,80 +140,8 @@ public class Hiro implements EventListener {
             jda.shutdown();
             jda.getHttpClient().connectionPool().evictAll();
             jda.getHttpClient().dispatcher().executorService().shutdown();
-            return;
         }
 
-        if (contentRaw.startsWith(PREFIX + "cvt")) {
-            // -cvt f 10c
-            //-cvt (\D) (\d+)(\D)
-            final String[] split = contentRaw.split("\\s+");
-            final List<String> args = List.of(split).subList(1, split.length);
-
-            if (args.size() < 2) {
-                sendHelpForCommand(channel);
-                return;
-            }
-
-            final String input = args.get(1);
-            final Matcher matcher = INPUT_PATTERN.matcher(input);
-
-            if (!matcher.matches()) {
-                sendHelpForCommand(channel);
-                return;
-            }
-
-            final String sourceUnit = matcher.group(2);
-            final Unit<? extends Quantity> inputUnit = getUnitForInput(sourceUnit);
-
-            if (inputUnit == null) {
-                sendHelpForCommand(channel);
-                return;
-            }
-
-            final String targetUnit = args.get(0).toLowerCase();
-            final var convertMethod = getConvertMethod(targetUnit);
-
-            if (convertMethod == null) {
-                sendHelpForCommand(channel);
-                return;
-            }
-
-            try {
-                final double inputVal = Double.parseDouble(matcher.group(1));
-
-                final Double apply = convertMethod.apply(inputVal, inputUnit);
-
-                channel.sendMessageFormat(
-                        "%.2f%s is %.2f%s",
-                        inputVal,
-                        inputUnit,
-                        apply,
-                        getUnitForInput(targetUnit)
-                ).queue();
-            } catch (ConversionException e) {
-                channel.sendMessage(e.getMessage()).queue();
-            }
-
-            /*double fahrenheit = 100;
-            final double celsius = toCelsius(fahrenheit, FAHRENHEIT);
-
-            channel.sendMessageFormat(
-                    "TEST: %f%sf is %f%sc",
-                    fahrenheit,
-                    DEGREE_SIGN,
-                    celsius,
-                    DEGREE_SIGN
-            ).queue();*/
-        }
-
-    }
-
-    private void sendHelpForCommand(TextChannel channel) {
-        channel.sendMessage("Correct usage for this command is `"+PREFIX+"cvt <unit-to-convert-to> <value>`\n" +
-                "Available length units are: km, m, cm, in, ft\n" +
-                "Available temperature units are: c, f, k\n" +
-                "Some examples of this are `"+PREFIX+"cvt f 30c`\n" +
-                "`"+PREFIX+"cvt c 100f`").queue();
     }
 
     public static void main(String[] args) throws LoginException {
