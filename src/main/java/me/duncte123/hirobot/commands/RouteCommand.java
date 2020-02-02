@@ -28,6 +28,16 @@ public class RouteCommand extends Command {
         try {
             final File file = new File("routes.json");
             final DataArray dataArray = DataArray.fromJson(Files.readString(file.toPath()));
+
+            // This little bit of code loads them all
+            /*tmp = new CBCharacter[dataArray.length()];
+
+            for (int i = 0; i < dataArray.length(); i++) {
+                tmp[i] = CBCharacter.fromData(dataArray.getObject(i));
+            }
+            */
+
+            // This just loads Hiro
             final DataObject dataObject = dataArray.getObject(0);
 
             tmp = new CBCharacter[] {
