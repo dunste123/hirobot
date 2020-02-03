@@ -16,6 +16,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RouteCommand extends Command {
     private final CBCharacter[] characters;
+    private final String[] endings = {
+            "perfect",
+            "good",
+            "bad",
+            "worst",
+    };
 
     public RouteCommand() {
         this.name = "route";
@@ -66,7 +72,7 @@ public class RouteCommand extends Command {
         return new EmbedBuilder()
                 .setThumbnail(character.getEmoteUrl())
                 .setColor(character.getColor())
-                .setTitle("Next: " + character.getName())
+                .setTitle(String.format("Next: %s, %s ending", character.getName(), getRandomEnding()))
                 .setDescription(character.getDescription())
                 .addField("Age", String.valueOf(character.getAge()), true)
                 .addField("Birthday", character.getBirthday(), true)
@@ -88,5 +94,9 @@ public class RouteCommand extends Command {
 
     private CBCharacter getRandomCharacter() {
         return this.characters[ThreadLocalRandom.current().nextInt(this.characters.length)];
+    }
+
+    private String getRandomEnding() {
+        return this.endings[ThreadLocalRandom.current().nextInt(this.endings.length)];
     }
 }
