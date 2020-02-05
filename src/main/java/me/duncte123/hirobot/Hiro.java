@@ -1,7 +1,9 @@
 package me.duncte123.hirobot;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import me.duncte123.hirobot.commands.CVTCommand;
 import me.duncte123.hirobot.commands.RouteCommand;
 import net.dv8tion.jda.api.JDA;
@@ -21,17 +23,18 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Hiro implements EventListener {
+    public static final String PREFIX = "-";
     private static final Logger LOGGER = LoggerFactory.getLogger(Hiro.class);
     private static final long OWNER_ID = 311769499995209728L;
     private static final long FAN_GUILD_ID = 670218976932134922L;
     private static final long STANS_ROLE_ID = 670368434017533962L;
     private static final long GENERAL_CHANNEL_ID = 670218976932134925L;
-    public static final String PREFIX = "-";
-//    private static final String DEGREE_SIGN = "\u00B0";
+    //    private static final String DEGREE_SIGN = "\u00B0";
     private static final String[] WELCOME_MESSAGES = {
             "Hey what's up {user}, welcome to my fanclub <:HiroCheer:670239465259794442>",
             "Hey listen up, {user} just joined",
@@ -50,6 +53,7 @@ public class Hiro implements EventListener {
         builder.setPrefix(PREFIX);
         builder.setActivity(Activity.playing("with Keitaro"));
         builder.setOwnerId(String.valueOf(OWNER_ID));
+        builder.setHelpConsumer(this::helpConsumer);
 
         builder.addCommands(
                 new CVTCommand(),
@@ -63,6 +67,42 @@ public class Hiro implements EventListener {
                 .addEventListeners(this, commandClient)
                 .setEnabledCacheFlags(EnumSet.noneOf(CacheFlag.class))
                 .build();
+    }
+
+    // Modified code from CommandClientImpl.java of JDA Utils
+    private void helpConsumer(CommandEvent event) {
+        final CommandClient client = event.getClient();
+        final List<Command> commands = client.getCommands();
+        final String ownerId = client.getOwnerId();
+        final String textPrefix = client.getTextualPrefix();
+        final String prefix = client.getPrefix();
+
+        final StringBuilder builder = new StringBuilder("**" + event.getSelfUser().getName() + "** commands:\n");
+        Command.Category category = null;
+
+        for (Command command : commands) {
+            if (!command.isHidden() && (!command.isOwnerCommand() || event.isOwner())) {
+                if (!Objects.equals(category, command.getCategory())) {
+                    category = command.getCategory();
+                    builder.append("\n\n  __").append(category == null ? "No Category" : category.getName()).append("__:\n");
+                }
+                builder.append("\n`").append(textPrefix).append(prefix == null ? " " : "").append(command.getName())
+                        .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
+                        .append(" - ").append(command.getHelp());
+            }
+        }
+
+        final User owner = event.getJDA().getUserById(ownerId);
+
+        if (owner != null) {
+            builder.append("\n\nFor additional help, contact **").append(owner.getName()).append("**#").append(owner.getDiscriminator());
+        }
+
+        event.reply(builder.toString(), (unused) -> {
+            if (event.isFromType(ChannelType.TEXT)) {
+                event.reactSuccess();
+            }
+        }, (t) -> event.replyWarning("Help cannot be sent because you are blocking Direct Messages."));
     }
 
     @Override
@@ -124,7 +164,7 @@ public class Hiro implements EventListener {
         channel.sendMessage(
                 WELCOME_MESSAGES[
                         ThreadLocalRandom.current().nextInt(WELCOME_MESSAGES.length)
-                ].replace("{user}", member.getUser().getAsMention())
+                        ].replace("{user}", member.getUser().getAsMention())
         ).queue();
 
         guild.addRoleToMember(member, stansRole).queue();
