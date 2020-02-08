@@ -76,7 +76,7 @@ public class Hiro implements EventListener {
         final String textPrefix = client.getTextualPrefix();
         final String prefix = client.getPrefix();
 
-        final StringBuilder builder = new StringBuilder("**So you want a taste of my commands?\nWell here they are:\n");
+        final StringBuilder builder = new StringBuilder("So you want a taste of my commands?\nWell here they are:\n");
         Command.Category category = null;
 
         for (Command command : commands) {
