@@ -36,9 +36,10 @@ public class RouteCommand extends Command {
             final DataArray dataArray = DataArray.fromJson(Files.readString(file.toPath()));
 
             // This little bit of code loads them all
-            tmp = new CBCharacter[dataArray.length()];
+            final int len = dataArray.length() - 4;
+            tmp = new CBCharacter[len];
 
-            for (int i = 0; i < dataArray.length() - 4; i++) {
+            for (int i = 0; i < len; i++) {
                 tmp[i] = CBCharacter.fromData(dataArray.getObject(i));
             }
 
