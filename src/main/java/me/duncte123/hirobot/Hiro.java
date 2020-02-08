@@ -73,7 +73,6 @@ public class Hiro implements EventListener {
     private void helpConsumer(CommandEvent event) {
         final CommandClient client = event.getClient();
         final List<Command> commands = client.getCommands();
-        final String ownerId = client.getOwnerId();
         final String textPrefix = client.getTextualPrefix();
         final String prefix = client.getPrefix();
 
@@ -90,12 +89,6 @@ public class Hiro implements EventListener {
                         .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
                         .append(" - ").append(command.getHelp());
             }
-        }
-
-        final User owner = event.getJDA().getUserById(ownerId);
-
-        if (owner != null) {
-            builder.append("\n\nFor additional help, contact **").append(owner.getName()).append("**#").append(owner.getDiscriminator());
         }
 
         event.reply(builder.toString(), (unused) -> {
