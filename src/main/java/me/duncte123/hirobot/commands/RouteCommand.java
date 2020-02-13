@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.utils.data.DataArray;
-import net.dv8tion.jda.api.utils.data.DataObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +31,7 @@ public class RouteCommand extends Command {
         CBCharacter[] tmp = null;
 
         try {
-            final File file = new File("routes.json");
+            final File file = new File("valentines.json");
             final DataArray dataArray = DataArray.fromJson(Files.readString(file.toPath()));
 
             // This little bit of code loads them all
@@ -70,7 +69,7 @@ public class RouteCommand extends Command {
 
     private EmbedBuilder generateEmbed(CBCharacter character) {
         return new EmbedBuilder()
-                .setThumbnail(character.getEmoteUrl())
+                .setThumbnail(character.getEmoteUrlGif())
                 .setColor(character.getColor())
                 .setTitle(String.format("Next: %s, %s ending", character.getName(), getRandomEnding()))
                 .setDescription(character.getDescription())

@@ -10,7 +10,8 @@ group = "me.duncte123"
 version = "1.0-SNAPSHOT"
 
 application {
-    mainClassName = "$group.hirobot.Hiro"
+//    mainClassName = "$group.hirobot.Hiro"
+    mainClassName = "$group.hirobot.RoutesJSRegexParser"
 }
 
 repositories {
