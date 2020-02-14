@@ -32,13 +32,9 @@ public class ValentineCommand extends Command {
         final Member member = event.getMember();
         final long userId = member.getIdLong();
         int valentineIndex = this.database.getValentine(userId);
-        final int storedIndex = valentineIndex;
 
         if (valentineIndex == -1) {
             valentineIndex = this.getRandomValentineIndex();
-        }
-
-        if (storedIndex != valentineIndex) {
             this.database.setValentine(userId, valentineIndex);
         }
 
