@@ -3,7 +3,6 @@ package me.duncte123.hirobot;
 import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.hash.TLongLongHashMap;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
 public class ReactionHelpers {
@@ -35,25 +34,23 @@ public class ReactionHelpers {
         ROLES_MAP.put(514293666936782850L, 672515881590587393L);
     }
 
-    public static void applyRole(long emoteId, Member member) {
-        final Guild guild = member.getGuild();
+    public static void applyRole(long emoteId, long userId, Guild guild) {
         final Role role = guild.getRoleById(ROLES_MAP.get(emoteId));
 
         if (role == null) {
             return;
         }
 
-        guild.addRoleToMember(member, role).queue();
+        guild.addRoleToMember(userId, role).queue();
     }
 
-    public static void removeRole(long emoteId, Member member) {
-        final Guild guild = member.getGuild();
+    public static void removeRole(long emoteId, long userId, Guild guild) {
         final Role role = guild.getRoleById(ROLES_MAP.get(emoteId));
 
         if (role == null) {
             return;
         }
 
-        guild.removeRoleFromMember(member, role).queue();
+        guild.removeRoleFromMember(userId, role).queue();
     }
 }

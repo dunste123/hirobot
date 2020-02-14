@@ -6,12 +6,11 @@ import me.duncte123.hirobot.objects.CBCharacter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.utils.data.DataArray;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static me.duncte123.hirobot.Utils.getUserStaticAvatarUrl;
+import static me.duncte123.hirobot.Utils.loadCharactersFromFile;
 
 public class RouteCommand extends Command {
     private final CBCharacter[] characters;
@@ -26,12 +25,12 @@ public class RouteCommand extends Command {
         this.name = "route";
         this.help = "Shows the next possible routes that you can take";
         this.cooldown = 60;
-        this.cooldownScope = CooldownScope.USER; // USER is default
+        this.cooldownScope = CooldownScope.GUILD; // USER is default
 
-        CBCharacter[] tmp = null;
+        /*CBCharacter[] tmp = null;
 
         try {
-            final File file = new File("valentines.json");
+            final File file = new File("routes.json");
             final DataArray dataArray = DataArray.fromJson(Files.readString(file.toPath()));
 
             // This little bit of code loads them all
@@ -43,17 +42,17 @@ public class RouteCommand extends Command {
             }
 
             // This just loads Hiro
-            /*final DataObject dataObject = dataArray.getObject(0);
+            *//*final DataObject dataObject = dataArray.getObject(0);
 
             tmp = new CBCharacter[] {
                     CBCharacter.fromData(dataObject)
-            };*/
+            };*//*
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        this.characters = tmp;
+        this.characters = loadCharactersFromFile("routes.json", 4);
     }
 
     @Override
@@ -79,16 +78,6 @@ public class RouteCommand extends Command {
                 .setFooter(
                         String.format("Play %s's route next. All bois are best bois.", character.getFirstName())
                 );
-    }
-
-    private String getUserStaticAvatarUrl(User user) {
-        final String avatarId = user.getAvatarId();
-
-        if (avatarId == null) {
-            return user.getDefaultAvatarUrl();
-        }
-
-        return String.format(User.AVATAR_URL, user.getId(), avatarId, "png");
     }
 
     private CBCharacter getRandomCharacter() {

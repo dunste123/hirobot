@@ -6,6 +6,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.duncte123.hirobot.commands.CVTCommand;
 import me.duncte123.hirobot.commands.RouteCommand;
+import me.duncte123.hirobot.commands.ValentineCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -34,7 +35,6 @@ public class Hiro implements EventListener {
     private static final long FAN_GUILD_ID = 670218976932134922L;
     private static final long STANS_ROLE_ID = 670368434017533962L;
     private static final long GENERAL_CHANNEL_ID = 670218976932134925L;
-    //    private static final String DEGREE_SIGN = "\u00B0";
     private static final String[] WELCOME_MESSAGES = {
             "Hey what's up {user}, welcome to my fanclub <:HiroCheer:670239465259794442>",
             "Hey listen up, {user} just joined",
@@ -45,9 +45,7 @@ public class Hiro implements EventListener {
             "Hands where I can see them {user} <:HiroSpray:670954573002833941>"
     };
 
-
     public Hiro(String token) throws LoginException {
-
         final CommandClientBuilder builder = new CommandClientBuilder();
 
         builder.setPrefix(PREFIX);
@@ -57,7 +55,8 @@ public class Hiro implements EventListener {
 
         builder.addCommands(
                 new CVTCommand(),
-                new RouteCommand()
+                new RouteCommand(),
+                new ValentineCommand()
         );
 
         final CommandClient commandClient = builder.build();
@@ -124,10 +123,9 @@ public class Hiro implements EventListener {
             return;
         }
 
-        final Member member = event.getMember();
         final long emoteId = event.getReactionEmote().getIdLong();
 
-        ReactionHelpers.applyRole(emoteId, member);
+        ReactionHelpers.applyRole(emoteId, event.getUserIdLong(), guild);
     }
 
     private void onGuildMessageReactionRemove(@Nonnull GuildMessageReactionRemoveEvent event) {
@@ -137,10 +135,9 @@ public class Hiro implements EventListener {
             return;
         }
 
-        final Member member = event.getMember();
         final long emoteId = event.getReactionEmote().getIdLong();
 
-        ReactionHelpers.removeRole(emoteId, member);
+        ReactionHelpers.removeRole(emoteId, event.getUserIdLong(), guild);
     }
 
     private void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
@@ -153,11 +150,10 @@ public class Hiro implements EventListener {
         final Role stansRole = Objects.requireNonNull(guild.getRoleById(STANS_ROLE_ID));
         final Member member = event.getMember();
         final TextChannel channel = Objects.requireNonNull(guild.getTextChannelById(GENERAL_CHANNEL_ID));
+        final int i = ThreadLocalRandom.current().nextInt(WELCOME_MESSAGES.length);
 
         channel.sendMessage(
-                WELCOME_MESSAGES[
-                        ThreadLocalRandom.current().nextInt(WELCOME_MESSAGES.length)
-                        ].replace("{user}", member.getUser().getAsMention())
+                WELCOME_MESSAGES[i].replace("{user}", member.getUser().getAsMention())
         ).queue();
 
         guild.addRoleToMember(member, stansRole).queue();
@@ -174,7 +170,6 @@ public class Hiro implements EventListener {
             jda.getHttpClient().connectionPool().evictAll();
             jda.getHttpClient().dispatcher().executorService().shutdown();
         }
-
     }
 
     public static void main(String[] args) throws LoginException {

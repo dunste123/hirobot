@@ -56,11 +56,11 @@ public class CBCharacter {
     }
 
     public String getEmoteUrlGif() {
-        return "https://cdn.discordapp.com/emojis/" + emoteId + ".gif?v=1";
+        return "https://cdn.discordapp.com/emojis/" + getEmoteId() + ".gif?v=1";
     }
 
     public String getEmoteUrlPng() {
-        return "https://cdn.discordapp.com/emojis/" + emoteId + ".png?v=1";
+        return "https://cdn.discordapp.com/emojis/" + getEmoteId() + ".png?v=1";
     }
 
     public static CBCharacter fromData(DataObject data) {
