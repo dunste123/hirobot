@@ -2,4 +2,5 @@
 .gradle/
 build/
 out/
-routes\.js
+routes.js
+database.db

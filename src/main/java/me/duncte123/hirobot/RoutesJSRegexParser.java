@@ -33,6 +33,7 @@ public class RoutesJSRegexParser {
             outputData.add(
                     DataObject.empty()
                     .put("name", d.get("name"))
+                    .put("description", d.get("tagline"))
                     .put("age", d.get("age"))
                     .put("birthday", d.get("bday"))
                     .put("animal", d.get("motif"))

@@ -2,7 +2,7 @@ package me.duncte123.hirobot.database;
 
 public interface Database {
 
-    void setValentine(long userId, int arrayIndex);
+    void setValentine(long userId, int buddyIndex);
 
     /**
      *
