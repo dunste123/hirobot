@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Hiro implements EventListener {
-    public static final String PREFIX = "!!";
+    public static final String PREFIX = "-";
     private static final Logger LOGGER = LoggerFactory.getLogger(Hiro.class);
     private static final long OWNER_ID = 311769499995209728L;
     private static final long FAN_GUILD_ID = 670218976932134922L;
