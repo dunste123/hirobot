@@ -40,8 +40,8 @@ public class SQLiteDatabase implements Database {
         config.setLeakDetectionThreshold(60 * 1000);
         ds = new HikariDataSource(config);
 
-        try (final Connection connection = ds.getConnection()) {
-            try (final Statement statement = connection.createStatement()) {
+        try (final Connection conn = ds.getConnection()) {
+            try (final Statement statement = conn.createStatement()) {
                 // language=SQLite
                 statement.execute("CREATE TABLE IF NOT EXISTS valentines (" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -58,11 +58,11 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public void setValentine(long userId, int buddyIndex) {
-        try (final Connection connection = ds.getConnection()) {
-            try (final PreparedStatement preparedStatement =
-                         // language=SQLite
-                         connection.prepareStatement("INSERT INTO valentines(buddy_index, user_id) VALUES(? , ?)")) {
-
+        try (final Connection conn = ds.getConnection()) {
+            try (final PreparedStatement preparedStatement = conn.prepareStatement(
+                    // language=SQLite
+                    "INSERT INTO valentines(buddy_index, user_id) VALUES(? , ?)"
+            )) {
                 preparedStatement.setInt(1, buddyIndex);
                 preparedStatement.setString(2, String.valueOf(userId));
 
@@ -75,11 +75,11 @@ public class SQLiteDatabase implements Database {
 
     @Override
     public int getValentine(long userId) {
-        try (final Connection connection = ds.getConnection()) {
-            try (final PreparedStatement preparedStatement =
-                         // language=SQLite
-                         connection.prepareStatement("SELECT buddy_index FROM valentines WHERE user_id = ?")) {
-
+        try (final Connection conn = ds.getConnection()) {
+            try (final PreparedStatement preparedStatement = conn.prepareStatement(
+                    // language=SQLite
+                    "SELECT buddy_index FROM valentines WHERE user_id = ?"
+            )) {
                 preparedStatement.setString(1, String.valueOf(userId));
 
                 try (final ResultSet resultSet = preparedStatement.executeQuery()) {
