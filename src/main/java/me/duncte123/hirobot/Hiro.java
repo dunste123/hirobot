@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -42,11 +43,14 @@ public class Hiro implements EventListener {
             "Someone tell bro Aiden to cook us a welcome feast for {user}",
             "I smell something fishy... Oh wait! {user} has joined us!",
             "What is that noise? Taiga making trouble again? Oh... It's just {user} joining us",
-            "Hands where I can see them {user} <:HiroSpray:670954573002833941>"
+            "Hands where I can see them {user} <:HiroSpray:670954573002833941>",
+            "That's my {user}"
     };
 
-    public Hiro(String token) throws LoginException {
+    public Hiro(String token) throws LoginException, IOException {
         final CommandClientBuilder builder = new CommandClientBuilder();
+
+        ReactionHelpers.load();
 
         builder.setPrefix(PREFIX);
         builder.setActivity(Activity.playing("with Keitaro"));
@@ -172,7 +176,7 @@ public class Hiro implements EventListener {
         }
     }
 
-    public static void main(String[] args) throws LoginException {
+    public static void main(String[] args) throws LoginException, IOException {
         if (args.length == 0) {
             throw new IllegalArgumentException("Haha yes this code wants token");
         }

@@ -1,9 +1,16 @@
 package me.duncte123.hirobot;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.hash.TLongLongHashMap;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ReactionHelpers {
     // reaction -> role
@@ -32,6 +39,22 @@ public class ReactionHelpers {
         ROLES_MAP.put(652587591115472907L, 672514904976261186L);
         // Aiden
         ROLES_MAP.put(514293666936782850L, 672515881590587393L);
+    }
+
+    public static void load() throws IOException {
+        final ObjectMapper mapper = new ObjectMapper();
+
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
+        mapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
+
+        ObjectNode d = mapper.readValue(new File("roles_map.json5"), ObjectNode.class);
+
+        d.fieldNames().forEachRemaining((key) -> {
+            final long longKey = Long.parseLong(key);
+
+            ROLES_MAP.put(longKey, d.get(key).asLong());
+        });
     }
 
     public static void applyRole(long emoteId, long userId, Guild guild) {
