@@ -33,7 +33,7 @@ public class Hiro implements EventListener {
     public static final String PREFIX = "-";
     private static final Logger LOGGER = LoggerFactory.getLogger(Hiro.class);
     private static final long OWNER_ID = 311769499995209728L;
-    private static final long FAN_GUILD_ID = 670218976932134922L;
+    public static final long FAN_GUILD_ID = 670218976932134922L;
     private static final long STANS_ROLE_ID = 670368434017533962L;
     private static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     private static final String[] WELCOME_MESSAGES = {
@@ -64,10 +64,11 @@ public class Hiro implements EventListener {
         );
 
         final CommandClient commandClient = builder.build();
+        final EventManager eventManager = new EventManager(this, commandClient);
 
         new JDABuilder()
                 .setToken(token)
-                .addEventListeners(this, commandClient)
+                .setEventManager(eventManager)
                 .setEnabledCacheFlags(EnumSet.noneOf(CacheFlag.class))
                 .build();
     }
