@@ -6,8 +6,6 @@ name: Build and release
 on:
   push:
     branches: [ gh-actions ]
-  pull_request:
-    branches: [  ]
 
 jobs:
   build:
@@ -24,9 +22,8 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Create a Release
-      uses: elgohr/Github-Release-Action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+    - name: Save artifact 
+      uses: actions/upload-artifact@v1
       with:
-        args: MyReleaseMessage
+        name: Ouput-jar
+        path: build/libs
