@@ -25,5 +25,5 @@ jobs:
     - name: Save artifact 
       uses: actions/upload-artifact@v1
       with:
-        name: Ouput-jar
-        path: build/libs
+        name: HiroBot-1.0-SNAPSHOT-all.jar
+        path: build/libs/HiroBot-1.0-SNAPSHOT-all.jar
