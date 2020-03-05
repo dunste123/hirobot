@@ -16,7 +16,7 @@ public class ReactionHelpers {
     // reaction -> role
     private static final TLongLongMap ROLES_MAP = new TLongLongHashMap();
 
-    static {
+    /*static {
         // Keitaro
         ROLES_MAP.put(514293667041771531L, 672512679625097269L);
         // Hunter
@@ -39,7 +39,7 @@ public class ReactionHelpers {
         ROLES_MAP.put(652587591115472907L, 672514904976261186L);
         // Aiden
         ROLES_MAP.put(514293666936782850L, 672515881590587393L);
-    }
+    }*/
 
     public static void load() throws IOException {
         final ObjectMapper mapper = new ObjectMapper();
@@ -48,7 +48,7 @@ public class ReactionHelpers {
         mapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
         mapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
 
-        ObjectNode d = mapper.readValue(new File("roles_map.json5"), ObjectNode.class);
+        final ObjectNode d = mapper.readValue(new File("roles_map.json5"), ObjectNode.class);
 
         d.fieldNames().forEachRemaining((key) -> {
             final long longKey = Long.parseLong(key);

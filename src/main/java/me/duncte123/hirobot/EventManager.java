@@ -1,6 +1,7 @@
 package me.duncte123.hirobot;
 
 import com.jagrosh.jdautilities.command.CommandClient;
+import me.duncte123.hirobot.events.FanServerEventHandler;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
@@ -15,9 +16,10 @@ public class EventManager implements IEventManager {
 
     private final EventListener[] fanServerListeners;
 
-    public EventManager(Hiro hiro, CommandClient commandClient) {
+    public EventManager(CommandClient commandClient) {
         fanServerListeners = new EventListener[] {
-                hiro, (EventListener) commandClient,
+                new FanServerEventHandler(),
+                (EventListener) commandClient,
         };
     }
 

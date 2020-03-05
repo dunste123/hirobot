@@ -5,7 +5,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import me.duncte123.hirobot.objects.CBCharacter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 
 import java.util.concurrent.ThreadLocalRandom;
 

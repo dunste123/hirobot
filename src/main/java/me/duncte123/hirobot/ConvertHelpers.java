@@ -15,8 +15,9 @@ import java.util.function.BiFunction;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
+@SuppressWarnings("rawtypes")
 public class ConvertHelpers {
-    public static final Map<String, BiFunction<Double, Unit, Double>> UNIT_MAP = new HashMap<>();
+    private static final Map<String, BiFunction<Double, Unit, Double>> UNIT_MAP = new HashMap<>();
 
     static {
         UNIT_MAP.put("c", ConvertHelpers::toCelsius);
@@ -31,12 +32,9 @@ public class ConvertHelpers {
         UNIT_MAP.put("mi", ConvertHelpers::toMile);
     }
 
+    @Nullable
     public static BiFunction<Double, Unit, Double> getConvertMethod(String unit) {
-        if (UNIT_MAP.containsKey(unit)) {
-            return UNIT_MAP.get(unit);
-        }
-
-        return null;
+        return UNIT_MAP.get(unit);
     }
 
     @Nullable
