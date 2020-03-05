@@ -5,7 +5,7 @@ name: Build and release
 
 on:
   push:
-    branches: [ gh-actions ]
+    branches: [ master ]
 
 jobs:
   build:
