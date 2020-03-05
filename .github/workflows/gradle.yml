@@ -23,7 +23,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Save artifact 
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2-preview
       with:
         name: HiroBot-1.0-SNAPSHOT-all.jar
         path: build/libs/HiroBot-1.0-SNAPSHOT-all.jar
