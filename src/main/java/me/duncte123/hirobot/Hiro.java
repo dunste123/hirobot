@@ -10,6 +10,8 @@ import me.duncte123.hirobot.commands.ValentineCommand;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import javax.security.auth.login.LoginException;
@@ -44,9 +46,13 @@ public class Hiro {
         final CommandClient commandClient = builder.build();
         final EventManager eventManager = new EventManager(commandClient);
 
-        new JDABuilder()
+        JDABuilder.create(
+                GatewayIntent.GUILD_MESSAGES,
+                GatewayIntent.GUILD_MESSAGE_REACTIONS
+        )
                 .setToken(token)
                 .setEventManager(eventManager)
+                .setMemberCachePolicy(MemberCachePolicy.NONE)
                 .setEnabledCacheFlags(EnumSet.noneOf(CacheFlag.class))
                 .build();
     }

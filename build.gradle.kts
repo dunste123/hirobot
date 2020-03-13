@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    implementation(group = "net.dv8tion", name = "JDA", version = "4.1.1_105")
+    implementation(group = "net.dv8tion", name = "JDA", version = "4.1.1_112")
     implementation(group = "com.jagrosh", name = "jda-utilities-command", version = "3.0.2")
     
     implementation(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")

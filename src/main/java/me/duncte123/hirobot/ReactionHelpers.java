@@ -58,7 +58,7 @@ public class ReactionHelpers {
     }
 
     public static void applyRole(long emoteId, long userId, Guild guild) {
-        final Role role = guild.getRoleById(ROLES_MAP.get(emoteId));
+        final Role role = getRole(emoteId, guild);
 
         if (role == null) {
             return;
@@ -68,12 +68,22 @@ public class ReactionHelpers {
     }
 
     public static void removeRole(long emoteId, long userId, Guild guild) {
-        final Role role = guild.getRoleById(ROLES_MAP.get(emoteId));
+        final Role role = getRole(emoteId, guild);
 
         if (role == null) {
             return;
         }
 
         guild.removeRoleFromMember(userId, role).queue();
+    }
+
+    private static Role getRole(long emoteId, Guild guild) {
+        final long roleId = ROLES_MAP.get(emoteId);
+
+        if (roleId < 1) {
+            return null;
+        }
+
+        return guild.getRoleById(roleId);
     }
 }

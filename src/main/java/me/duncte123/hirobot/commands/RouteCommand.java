@@ -23,35 +23,10 @@ public class RouteCommand extends Command {
     public RouteCommand() {
         this.name = "route";
         this.help = "Shows the next possible routes that you can take";
-        this.cooldown = 60;
+        this.cooldown = 10;
         this.cooldownScope = CooldownScope.GUILD; // USER is default
 
-        /*CBCharacter[] tmp = null;
-
-        try {
-            final File file = new File("routes.json");
-            final DataArray dataArray = DataArray.fromJson(Files.readString(file.toPath()));
-
-            // This little bit of code loads them all
-            final int len = dataArray.length() - 4;
-            tmp = new CBCharacter[len];
-
-            for (int i = 0; i < len; i++) {
-                tmp[i] = CBCharacter.fromData(dataArray.getObject(i));
-            }
-
-            // This just loads Hiro
-            *//*final DataObject dataObject = dataArray.getObject(0);
-
-            tmp = new CBCharacter[] {
-                    CBCharacter.fromData(dataObject)
-            };*//*
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-        this.characters = loadCharactersFromFile("routes.json", 4);
+        this.characters = loadCharactersFromFile("routes.json");
     }
 
     @Override
