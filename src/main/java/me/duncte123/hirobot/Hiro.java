@@ -47,6 +47,7 @@ public class Hiro {
         final EventManager eventManager = new EventManager(commandClient);
 
         JDABuilder.create(
+                GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS
         )
