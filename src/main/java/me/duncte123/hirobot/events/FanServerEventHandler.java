@@ -54,7 +54,7 @@ public class FanServerEventHandler implements EventListener {
     private void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
         final Guild guild = event.getGuild();
 
-        if (guild.getIdLong() != FAN_GUILD_ID) {
+        if (guild.getIdLong() != FAN_GUILD_ID || event.getChannel().getIdLong() != ROLES_CHANNEL_ID) {
             return;
         }
 
@@ -66,7 +66,7 @@ public class FanServerEventHandler implements EventListener {
     private void onGuildMessageReactionRemove(@Nonnull GuildMessageReactionRemoveEvent event) {
         final Guild guild = event.getGuild();
 
-        if (guild.getIdLong() != FAN_GUILD_ID) {
+        if (guild.getIdLong() != FAN_GUILD_ID || event.getChannel().getIdLong() != ROLES_CHANNEL_ID) {
             return;
         }
 

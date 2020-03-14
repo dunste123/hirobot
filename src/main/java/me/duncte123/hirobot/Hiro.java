@@ -26,6 +26,7 @@ public class Hiro {
     public static final long FAN_GUILD_ID = 670218976932134922L;
     public static final long STANS_ROLE_ID = 670368434017533962L;
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
+    public static final long ROLES_CHANNEL_ID = 672361818429325312L;
 
     public Hiro(String token) throws LoginException, IOException {
         final CommandClientBuilder builder = new CommandClientBuilder();
