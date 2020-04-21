@@ -4,3 +4,5 @@ build/
 out/
 routes.js
 database.db
+!.idea/copyright/hirobot.xml
+!.idea/copyright/profiles_settings.xml
