@@ -23,6 +23,7 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.duncte123.hirobot.commands.CVTCommand;
+import me.duncte123.hirobot.commands.DialogCommand;
 import me.duncte123.hirobot.commands.RouteCommand;
 import me.duncte123.hirobot.commands.ValentineCommand;
 import net.dv8tion.jda.api.JDABuilder;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Hiro {
-    public static final String PREFIX = "-";
+    public static final String PREFIX = "!!";
     public static final long OWNER_ID = 311769499995209728L;
     public static final long FAN_GUILD_ID = 670218976932134922L;
     public static final long STANS_ROLE_ID = 670368434017533962L;
@@ -59,7 +60,8 @@ public class Hiro {
         builder.addCommands(
                 new CVTCommand(),
                 new RouteCommand(),
-                new ValentineCommand()
+                new ValentineCommand(),
+                new DialogCommand()
         );
 
         final CommandClient commandClient = builder.build();
