@@ -36,8 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static me.duncte123.hirobot.ReactionHelpers.getJackson;
 
@@ -76,10 +75,18 @@ public class MealCommand extends Command {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 final JsonNode meal = jackson.readTree(IOUtil.readFully(IOUtil.getBody(response))).get("meals").get(0);
                 final MessageEmbed embed = buildEmbed(meal);
+                final String mealOfDay = getMealOfDay();
+                final String msg;
+
+                if (mealOfDay == null) {
+                    msg = "So you want a mid-night snack eh " + event.getAuthor().getAsMention() + "?\n" +
+                            "I won't judge <:HiroSmug:670239478279045131>";
+                } else {
+                    msg = event.getAuthor().getAsMention() + ", here is what's for " + mealOfDay;
+                }
+
                 final Message message = new MessageBuilder()
-                        .setContent(event.getAuthor().getAsMention())
-                        .append(", here is what's for ")
-                        .append(getMealOfDay())
+                        .setContent(msg)
                         .setEmbed(embed)
                         .build();
 
@@ -101,11 +108,24 @@ public class MealCommand extends Command {
                 .setThumbnail(meal.get("strMealThumb").asText())
                 .addField("Ingredients", getIngredients(meal), false)
                 .addField("Instructions", meal.get("strInstructions").asText(), false)
+                .setFooter("Time used to determine what meal is next is in UTC.")
                 .build();
     }
 
     private String getMealOfDay() {
-        return "(breakfast/lunch/dinner)";
+        Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+        final int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+        if (hour < 12) {
+            return "breakfast";
+        } else if (hour < 18) {
+            return "lunch";
+        } else if (hour  < 22) {
+            return "dinner";
+        }
+
+        // Midnight snack smh
+        return null;
     }
 
     private String getIngredients(JsonNode meal) {
