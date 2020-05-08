@@ -124,7 +124,7 @@ public class MealCommand extends Command {
             return "dinner";
         }
 
-        // Midnight snack smh
+        // Midnight snack smh my head
         return null;
     }
 
