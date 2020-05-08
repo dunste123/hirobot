@@ -44,7 +44,7 @@ public class Hiro {
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     public static final long ROLES_CHANNEL_ID = 672361818429325312L;
 
-    public Hiro(String token) throws LoginException, IOException {
+    public Hiro(String token, String mealApiKey) throws LoginException, IOException {
         final CommandClientBuilder builder = new CommandClientBuilder();
 
         ReactionHelpers.load();
@@ -59,7 +59,7 @@ public class Hiro {
                 new RouteCommand(),
                 new ValentineCommand(),
                 new DialogCommand(),
-                new MealCommand()
+                new MealCommand(mealApiKey)
         );
 
         final CommandClient commandClient = builder.build();
@@ -103,10 +103,10 @@ public class Hiro {
     }
 
     public static void main(String[] args) throws LoginException, IOException {
-        if (args.length == 0) {
-            throw new IllegalArgumentException("Haha yes this code wants token");
+        if (args.length < 2) {
+            throw new IllegalArgumentException("Usage is java -jar Hiro.jar <bot token> <meal api key>");
         }
 
-        new Hiro(args[0]);
+        new Hiro(args[0], args[1]);
     }
 }

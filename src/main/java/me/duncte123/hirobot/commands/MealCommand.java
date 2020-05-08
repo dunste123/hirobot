@@ -48,19 +48,21 @@ public class MealCommand extends Command {
     private static final int MAX_INGREDIENTS = 20;
 
     private final ObjectMapper jackson;
+    private final String mealApiKey;
 
-    public MealCommand() {
+    public MealCommand(String mealApiKey) {
         this.name = "meal";
         this.help = "Get to see what Hiro and Aiden will be serving";
         this.cooldown = 60;
         this.jackson = getJackson();
+        this.mealApiKey = mealApiKey;
     }
 
     @Override
     protected void execute(CommandEvent event) {
         final Request request = new Request.Builder()
                 .get()
-                .url("https://www.themealdb.com/api/json/v1/1/random.php")
+                .url("https://www.themealdb.com/api/json/v1/" + this.mealApiKey + "/random.php")
                 .header("Accept", "application/json")
                 .header("User-Agent", "HiroBot (https://github.com/dunste123/hirobot)")
                 .build();
