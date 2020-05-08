@@ -70,7 +70,7 @@ public class DialogCommand extends Command {
     );
     /// </editor-fold>
 
-    private final OkHttpClient client = new OkHttpClient();
+    static final OkHttpClient client = new OkHttpClient();
 
     public DialogCommand() {
         this.name = "dialog";
@@ -122,7 +122,7 @@ public class DialogCommand extends Command {
 
         final Request request = makeRequest(background, character, message);
 
-        this.client.newCall(request).enqueue(new Callback() {
+        client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 event.reply(String.format("Something went wrong: `%s`", e.getMessage()));

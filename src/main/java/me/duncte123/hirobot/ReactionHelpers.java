@@ -59,8 +59,18 @@ public class ReactionHelpers {
         ROLES_MAP.put(514293666936782850L, 672515881590587393L);
     }*/
 
-    public static void load() throws IOException {
+    public static ObjectMapper getJackson() {
         final ObjectMapper mapper = new ObjectMapper();
+
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
+        mapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
+
+        return mapper;
+    }
+
+    public static void load() throws IOException {
+        final ObjectMapper mapper = getJackson();
 
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
