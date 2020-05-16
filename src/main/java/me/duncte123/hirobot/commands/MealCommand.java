@@ -102,7 +102,7 @@ public class MealCommand extends Command {
         final String url = String.format(
                 "https://www.themealdb.com/meal/%s-%s",
                 meal.get("idMeal").asText(),
-                meal.get("strMeal").asText().replaceAll("\\s+", "-")
+                title.replaceAll("\\s+", "-")
         );
 
         return new EmbedBuilder()
