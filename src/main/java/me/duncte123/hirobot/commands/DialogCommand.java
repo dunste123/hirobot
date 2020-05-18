@@ -22,6 +22,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import net.dv8tion.jda.internal.utils.IOUtil;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,45 +31,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static me.duncte123.hirobot.Hiro.PREFIX;
 
 public class DialogCommand extends Command {
-    /// <editor-fold desc="BACKGROUNDS ... CHARACTERS" defaultstate="collapsed">
-    private static final List<String> BACKGROUNDS = List.of(
-            "bath",
-            "beach",
-            "cabin",
-            "camp",
-            "cave",
-            "forest",
-            "messhall"
-    );
-    private static final List<String> CHARACTERS = List.of(
-            "aiden",
-            "avan",
-            "chiaki",
-            "connor",
-            "eduard",
-            "felix",
-            "goro",
-            "hiro",
-            "hunter",
-            "jirou",
-            "keitaro",
-            "kieran",
-            "knox",
-            "lee",
-            "naoto",
-            "natsumi",
-            "seto",
-            "taiga",
-            "yoichi",
-            "yoshi",
-            "yuri",
-            "yuuto"
-    );
-    /// </editor-fold>
+    private final List<String> backgrounds = new ArrayList<>();
+    private final List<String> characters = new ArrayList<>();
 
     private final OkHttpClient client = new OkHttpClient();
 
@@ -78,6 +47,11 @@ public class DialogCommand extends Command {
         this.arguments = "[background] <character> <text>";
         this.cooldown = 10;
         this.cooldownScope = CooldownScope.GLOBAL;
+
+        final Pair<List<String>, List<String>> items = this.fetchBackgroundsAndCharacters();
+
+        characters.addAll(items.getLeft());
+        backgrounds.addAll(items.getRight());
     }
 
     @Override
@@ -93,19 +67,19 @@ public class DialogCommand extends Command {
         String character = test.remove(0).toLowerCase();
         final String background;
 
-        if (CHARACTERS.contains(character)) {
+        if (characters.contains(character)) {
             background = "camp";
         } else {
             background = character;
             character = test.remove(0).toLowerCase();
         }
 
-        if (!CHARACTERS.contains(character)) {
+        if (!characters.contains(character)) {
             event.reply(String.format("I don't think that I know `%s` <:HiroConfused:670239474134810624>", character));
             return;
         }
 
-        if (!BACKGROUNDS.contains(background)) {
+        if (!backgrounds.contains(background)) {
             event.reply(String.format("Sorry but I don't know where `%s` is <:HiroSweat:670239468829147156>", background));
             return;
         }
@@ -155,6 +129,40 @@ public class DialogCommand extends Command {
                 .url("https://yuuto.dunctebot.com/dialog")
                 .post(RequestBody.create(null, json))
                 .header("Content-Type", "application/json")
+                .header("User-Agent", "HiroBot")
                 .build();
+    }
+
+    // Characters -> Backgrounds
+    private Pair<List<String>, List<String>> fetchBackgroundsAndCharacters() {
+        final Request request = new Request.Builder()
+                .url("https://yuuto.dunctebot.com/info")
+                .get()
+                .header("User-Agent", "HiroBot")
+                .build();
+
+        try {
+            final Response response = this.client.newCall(request).execute();
+            final byte[] bytes = IOUtil.readFully(IOUtil.getBody(response));
+            final DataObject json = DataObject.fromJson(bytes);
+
+            final List<String> characters = json.getArray("characters")
+                    .toList()
+                    .stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
+
+            final List<String> backgrounds = json.getArray("backgrounds")
+                    .toList()
+                    .stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
+
+            return Pair.of(characters, backgrounds);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return Pair.of(List.of(), List.of());
     }
 }

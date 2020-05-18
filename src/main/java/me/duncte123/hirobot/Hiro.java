@@ -75,7 +75,7 @@ public class Hiro {
                 .setToken(token)
                 .setEventManager(eventManager)
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
-                .setEnabledCacheFlags(EnumSet.noneOf(CacheFlag.class))
+                .disableCache(EnumSet.allOf(CacheFlag.class))
                 .build();
     }
 
