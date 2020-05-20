@@ -126,6 +126,8 @@ public class FanServerEventHandler implements EventListener {
             jda.getHttpClient().connectionPool().evictAll();
             jda.getHttpClient().dispatcher().executorService().shutdown();
 
+            System.exit(0);
+
             return;
         }
 
