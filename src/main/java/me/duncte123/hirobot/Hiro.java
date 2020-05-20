@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Hiro {
-    public static final String PREFIX = "-";
+    public static final String PREFIX = "!!";
     public static final long OWNER_ID = 311769499995209728L;
     public static final long FAN_GUILD_ID = 670218976932134922L;
     public static final long STANS_ROLE_ID = 670368434017533962L;

@@ -19,6 +19,7 @@
 package me.duncte123.hirobot.events;
 
 import me.duncte123.hirobot.ReactionHelpers;
+import me.duncte123.hirobot.chat.ChatBot;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -49,6 +50,8 @@ public class FanServerEventHandler implements EventListener {
             "Hands where I can see them {user} <:HiroSpray:670954573002833941>",
             "That's my {user}"
     };
+
+    private final ChatBot chatbot = new ChatBot();
 
     @Override
     public void onEvent(@Nonnull GenericEvent event) {
@@ -122,6 +125,17 @@ public class FanServerEventHandler implements EventListener {
             jda.shutdown();
             jda.getHttpClient().connectionPool().evictAll();
             jda.getHttpClient().dispatcher().executorService().shutdown();
+
+            return;
+        }
+
+        final String selfMention = event.getGuild().getSelfMember().getAsMention();
+
+        if (contentRaw.startsWith(selfMention)) {
+            this.chatbot.handleInput(
+                    contentRaw.replaceFirst(selfMention, ""),
+                    event
+            );
         }
     }
 }
