@@ -129,11 +129,14 @@ public class FanServerEventHandler implements EventListener {
             return;
         }
 
-        final String selfMention = event.getGuild().getSelfMember().getAsMention();
+        final SelfUser selfUser = event.getJDA().getSelfUser();
+        final String selfId = selfUser.getId();
+        final String selfMemberMention = "<@!" + selfId + '>';
+        final String selfUserMention = selfUser.getAsMention();
 
-        if (contentRaw.startsWith(selfMention)) {
+        if (contentRaw.startsWith(selfMemberMention) || contentRaw.startsWith(selfUserMention)) {
             this.chatbot.handleInput(
-                    contentRaw.replaceFirst(selfMention, ""),
+                    contentRaw.replaceFirst("<@!?" + selfId + '>', "").trim(),
                     event
             );
         }

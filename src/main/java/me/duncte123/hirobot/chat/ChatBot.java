@@ -60,7 +60,7 @@ public class ChatBot {
 
     private void handleInternally(String input, GuildMessageReceivedEvent event) throws Exception {
         final User author = event.getAuthor();
-        final String response = this.getResponse(input, "123456789");
+        final String response = this.getResponse(input, author.getId());
 
         event.getChannel()
                 .sendMessage(author.getAsMention())
@@ -83,27 +83,21 @@ public class ChatBot {
      */
     private String getResponse(String input, String userId) throws Exception {
         try (SessionsClient sessionsClient = SessionsClient.create()) {
-
-            SessionName session = SessionName.of(PROJECT_ID, userId);
-            System.out.println("Session Path: " + session.toString());
-
-            TextInput.Builder textInput =
-                    TextInput.newBuilder().setText(input).setLanguageCode("en-US");
-
+            final SessionName session = SessionName.of(PROJECT_ID, userId);
+            final TextInput.Builder textInput = TextInput.newBuilder().setText(input).setLanguageCode("en-US");
             // Build the query with the TextInput
-            QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
-
+            final QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
             // Performs the detect intent request
-            DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
-
+            final DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
             // Display the query result
-            QueryResult queryResult = response.getQueryResult();
+            final QueryResult queryResult = response.getQueryResult();
 
-            System.out.println("====================");
-            System.out.format("Query Text: '%s'\n", queryResult.getQueryText());
-            System.out.format("Detected Intent: %s (confidence: %f)\n",
+            LOGGER.info("====================");
+            LOGGER.info("Query Text: '{}'", queryResult.getQueryText());
+            LOGGER.info("Detected Intent: {} (confidence: {})",
                     queryResult.getIntent().getDisplayName(), queryResult.getIntentDetectionConfidence());
-            System.out.format("Fulfillment Text: '%s'\n", queryResult.getFulfillmentText());
+            LOGGER.info("Detected action: {}", queryResult.getAction());
+            LOGGER.info("Fulfillment Text: '{}'", queryResult.getFulfillmentText());
 
             return queryResult.getFulfillmentText();
         }
