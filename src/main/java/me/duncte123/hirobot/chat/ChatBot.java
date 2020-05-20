@@ -27,30 +27,9 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * java.io.IOException: The Application Default Credentials are not available. They are available if running in Google Compute Engine. Otherwise, the environment variable GOOGLE_APPLICATION_CREDENTIALS must be defined pointing to a file defining the credentials. See https://developers.google.com/accounts/docs/application-default-credentials for more information.
- * 	at com.google.auth.oauth2.DefaultCredentialsProvider.getDefaultCredentials(DefaultCredentialsProvider.java:134)
- * 	at com.google.auth.oauth2.GoogleCredentials.getApplicationDefault(GoogleCredentials.java:119)
- * 	at com.google.auth.oauth2.GoogleCredentials.getApplicationDefault(GoogleCredentials.java:91)
- * 	at com.google.api.gax.core.GoogleCredentialsProvider.getCredentials(GoogleCredentialsProvider.java:67)
- * 	at com.google.api.gax.rpc.ClientContext.create(ClientContext.java:135)
- * 	at com.google.cloud.dialogflow.v2.stub.GrpcSessionsStub.create(GrpcSessionsStub.java:78)
- * 	at com.google.cloud.dialogflow.v2.stub.SessionsStubSettings.createStub(SessionsStubSettings.java:108)
- * 	at com.google.cloud.dialogflow.v2.SessionsClient.<init>(SessionsClient.java:132)
- * 	at com.google.cloud.dialogflow.v2.SessionsClient.create(SessionsClient.java:114)
- * 	at com.google.cloud.dialogflow.v2.SessionsClient.create(SessionsClient.java:106)
- * 	at me.duncte123.hirobot.chat.ChatBot.getResponse(ChatBot.java:83)
- * 	at me.duncte123.hirobot.chat.ChatBot.handleInternally(ChatBot.java:62)
- * 	at me.duncte123.hirobot.chat.ChatBot.lambda$handleInput$1(ChatBot.java:53)
- * 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
- * 	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
- * 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
- * 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
- * 	at java.base/java.lang.Thread.run(Thread.java:834)
- */
 public class ChatBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatBot.class);
-    private static final String PROJECT_ID = "";
+    private static final String PROJECT_ID = "hiro-akiba-burymj";
     private final ExecutorService executor = Executors.newSingleThreadExecutor((r) -> {
         final Thread t = new Thread(r, "chatbot-thread");
 
@@ -71,6 +50,7 @@ public class ChatBot {
     public void handleInput(String input, GuildMessageReceivedEvent event) {
         executor.submit(() -> {
             try {
+                event.getChannel().sendTyping().queue();
                 this.handleInternally(input, event);
             } catch (Exception e) {
                 LOGGER.error("Failed to run chatbot", e);
@@ -84,6 +64,7 @@ public class ChatBot {
 
         event.getChannel()
                 .sendMessage(author.getAsMention())
+                .append(", ")
                 .append(response)
                 .queue();
     }
