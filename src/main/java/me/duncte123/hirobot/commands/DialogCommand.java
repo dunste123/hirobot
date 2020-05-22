@@ -107,6 +107,9 @@ public class DialogCommand extends Command {
                 final InputStream body = IOUtil.getBody(response);
                 final byte[] bytes = IOUtil.readFully(body);
 
+                // close the response because we are done with it
+                response.close();
+
                 event.getChannel().sendFile(
                         bytes,
                         "dialog.png"
@@ -141,8 +144,7 @@ public class DialogCommand extends Command {
                 .header("User-Agent", "HiroBot")
                 .build();
 
-        try {
-            final Response response = this.client.newCall(request).execute();
+        try (final Response response = this.client.newCall(request).execute()) {
             final byte[] bytes = IOUtil.readFully(IOUtil.getBody(response));
             final DataObject json = DataObject.fromJson(bytes);
 
