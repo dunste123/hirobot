@@ -49,6 +49,8 @@ dependencies {
     implementation(group = "com.zaxxer", name = "HikariCP", version = "3.4.1")
     implementation(group = "org.xerial", name = "sqlite-jdbc", version = "3.30.1")
 
+    implementation(group = "com.google.cloud", name = "google-cloud-dialogflow", version = "2.0.0")
+
 }
 
 tasks.withType<JavaCompile> {

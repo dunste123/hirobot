@@ -34,10 +34,11 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import javax.security.auth.login.LoginException;
+import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.util.*;
 
 public class Hiro {
     public static final String PREFIX = "-";
@@ -47,7 +48,7 @@ public class Hiro {
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     public static final long ROLES_CHANNEL_ID = 672361818429325312L;
 
-    public Hiro(String token) throws LoginException, IOException {
+    public Hiro() throws LoginException, IOException {
         final CommandClientBuilder builder = new CommandClientBuilder();
 
         ReactionHelpers.load();
@@ -72,7 +73,7 @@ public class Hiro {
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS
         )
-                .setToken(token)
+                .setToken(System.getenv("TOKEN"))
                 .setEventManager(eventManager)
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
                 .disableCache(EnumSet.allOf(CacheFlag.class))
@@ -108,11 +109,43 @@ public class Hiro {
         }, (t) -> event.replyWarning("Help cannot be sent because you are blocking Direct Messages."));
     }
 
-    public static void main(String[] args) throws LoginException, IOException {
-        if (args.length == 0) {
-            throw new IllegalArgumentException("Haha yes this code wants token");
+    public static void main(String[] args) throws Exception {
+        final Map<String, String> customEnv = loadEnvironment();
+        // Put stuff in the env at runtime so we don't have to worry about them cli command
+        getModifiableEnvironment().putAll(customEnv);
+
+        new Hiro();
+    }
+
+    private static Map<String, String> loadEnvironment() throws IOException {
+        final Map<String, String> env = new HashMap<>();
+        final List<String> lines = Files.readAllLines(new File(".env").toPath());
+
+        for (String line : lines) {
+            final String[] kv = line.split("=");
+
+            env.put(kv[0], kv[1]);
         }
 
-        new Hiro(args[0]);
+        return env;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String,String> getModifiableEnvironment() throws Exception{
+        Class<?> pe = Class.forName("java.lang.ProcessEnvironment");
+
+        final Field theCaseInsensitiveEnvironment = pe.getDeclaredField("theCaseInsensitiveEnvironment");
+
+        theCaseInsensitiveEnvironment.setAccessible(true);
+
+        return (Map<String, String>)theCaseInsensitiveEnvironment.get(null);
+
+        /*Method getenv = pe.getDeclaredMethod("getenv");
+        getenv.setAccessible(true);
+        Object unmodifiableEnvironment = getenv.invoke(null);
+        Class<?> map = Class.forName("java.util.Collections$UnmodifiableMap");
+        Field m = map.getDeclaredField("m");
+        m.setAccessible(true);
+        return (Map<String, String>) m.get(unmodifiableEnvironment);*/
     }
 }
