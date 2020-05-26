@@ -107,6 +107,9 @@ public class DialogCommand extends Command {
                 final InputStream body = IOUtil.getBody(response);
                 final byte[] bytes = IOUtil.readFully(body);
 
+                // close the response because we are done with it
+                response.close();
+
                 event.getChannel().sendFile(
                         bytes,
                         "dialog.png"
