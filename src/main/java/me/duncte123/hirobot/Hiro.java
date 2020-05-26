@@ -48,7 +48,7 @@ public class Hiro {
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     public static final long ROLES_CHANNEL_ID = 672361818429325312L;
 
-    public Hiro(String token) throws LoginException, IOException {
+    public Hiro() throws LoginException, IOException {
         final CommandClientBuilder builder = new CommandClientBuilder();
 
         ReactionHelpers.load();
@@ -73,7 +73,7 @@ public class Hiro {
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS
         )
-                .setToken(token)
+                .setToken(System.getenv("TOKEN"))
                 .setEventManager(eventManager)
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
                 .disableCache(EnumSet.allOf(CacheFlag.class))
@@ -114,7 +114,7 @@ public class Hiro {
         // Put stuff in the env at runtime so we don't have to worry about them cli command
         getModifiableEnvironment().putAll(customEnv);
 
-        new Hiro(customEnv.get("TOKEN"));
+        new Hiro();
     }
 
     private static Map<String, String> loadEnvironment() throws IOException {
