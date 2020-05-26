@@ -36,7 +36,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -47,6 +46,8 @@ public class Hiro {
     public static final long STANS_ROLE_ID = 670368434017533962L;
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     public static final long ROLES_CHANNEL_ID = 672361818429325312L;
+
+    private static final Map<String, String> customEnv = new HashMap<>();
 
     public Hiro() throws LoginException, IOException {
         final CommandClientBuilder builder = new CommandClientBuilder();
@@ -73,7 +74,7 @@ public class Hiro {
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS
         )
-                .setToken(System.getenv("TOKEN"))
+                .setToken(customEnv.get("TOKEN"))
                 .setEventManager(eventManager)
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
                 .disableCache(EnumSet.allOf(CacheFlag.class))
@@ -110,9 +111,9 @@ public class Hiro {
     }
 
     public static void main(String[] args) throws Exception {
-        final Map<String, String> customEnv = loadEnvironment();
+        final Map<String, String> envFile = loadEnvironment();
         // Put stuff in the env at runtime so we don't have to worry about them cli command
-        getModifiableEnvironment().putAll(customEnv);
+        customEnv.putAll(envFile);
 
         new Hiro();
     }
@@ -128,24 +129,5 @@ public class Hiro {
         }
 
         return env;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String,String> getModifiableEnvironment() throws Exception{
-        Class<?> pe = Class.forName("java.lang.ProcessEnvironment");
-
-        final Field theCaseInsensitiveEnvironment = pe.getDeclaredField("theCaseInsensitiveEnvironment");
-
-        theCaseInsensitiveEnvironment.setAccessible(true);
-
-        return (Map<String, String>)theCaseInsensitiveEnvironment.get(null);
-
-        /*Method getenv = pe.getDeclaredMethod("getenv");
-        getenv.setAccessible(true);
-        Object unmodifiableEnvironment = getenv.invoke(null);
-        Class<?> map = Class.forName("java.util.Collections$UnmodifiableMap");
-        Field m = map.getDeclaredField("m");
-        m.setAccessible(true);
-        return (Map<String, String>) m.get(unmodifiableEnvironment);*/
     }
 }

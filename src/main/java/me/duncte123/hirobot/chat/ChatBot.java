@@ -18,18 +18,25 @@
 
 package me.duncte123.hirobot.chat;
 
+import com.google.api.gax.core.FixedCredentialsProvider;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.dialogflow.v2.*;
+import com.google.common.collect.Lists;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ChatBot {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatBot.class);
     private static final String PROJECT_ID = "hiro-akiba-burymj";
+    private static final String CREDS_FILE = "hiro-akiba-8f9a5c0a58a0.json";
+    private static SessionsSettings SETTINGS = null;
     private final ExecutorService executor = Executors.newSingleThreadExecutor((r) -> {
         final Thread t = new Thread(r, "chatbot-thread");
 
@@ -38,6 +45,19 @@ public class ChatBot {
 
         return t;
     });
+
+    static {
+        try {
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(CREDS_FILE))
+                    .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform", "https://www.googleapis.com/auth/dialogflow"));
+
+            SETTINGS = SessionsSettings.newBuilder()
+                            .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
+                            .build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Handles the input from the chatbot
@@ -82,7 +102,7 @@ public class ChatBot {
      * @throws Exception when google did throw
      */
     private String getResponse(String input, String userId) throws Exception {
-        try (SessionsClient sessionsClient = SessionsClient.create()) {
+        try (SessionsClient sessionsClient = SessionsClient.create(SETTINGS)) {
             final SessionName session = SessionName.of(PROJECT_ID, userId);
             final TextInput.Builder textInput = TextInput.newBuilder().setText(input).setLanguageCode("en-US");
             // Build the query with the TextInput
@@ -102,5 +122,4 @@ public class ChatBot {
             return queryResult.getFulfillmentText();
         }
     }
-
 }
