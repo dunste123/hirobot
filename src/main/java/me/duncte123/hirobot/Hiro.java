@@ -56,6 +56,7 @@ public class Hiro {
 
         builder.setPrefix(PREFIX);
         builder.setActivity(Activity.listening("Greatest Memories"));
+//        builder.setActivity(Activity.streaming("Portal", "https://twitch.tv/super_hiro69"));
         builder.setOwnerId(String.valueOf(OWNER_ID));
         builder.setHelpConsumer(this::helpConsumer);
 
