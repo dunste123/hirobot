@@ -26,8 +26,8 @@ import me.duncte123.hirobot.commands.CVTCommand;
 import me.duncte123.hirobot.commands.DialogCommand;
 import me.duncte123.hirobot.commands.RouteCommand;
 import me.duncte123.hirobot.commands.ValentineCommand;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -49,14 +49,17 @@ public class Hiro {
 
     private static final Map<String, String> customEnv = new HashMap<>();
 
+    public final JDA jda;
+
     public Hiro() throws LoginException, IOException {
         final CommandClientBuilder builder = new CommandClientBuilder();
 
         ReactionHelpers.load();
 
         builder.setPrefix(PREFIX);
-        builder.setActivity(Activity.listening("Greatest Memories"));
+//        builder.setActivity(Activity.listening("Greatest Memories"));
 //        builder.setActivity(Activity.streaming("Portal", "https://twitch.tv/super_hiro69"));
+        builder.setActivity(null);
         builder.setOwnerId(String.valueOf(OWNER_ID));
         builder.setHelpConsumer(this::helpConsumer);
 
@@ -68,9 +71,9 @@ public class Hiro {
         );
 
         final CommandClient commandClient = builder.build();
-        final EventManager eventManager = new EventManager(commandClient);
+        final EventManager eventManager = new EventManager(commandClient, this);
 
-        JDABuilder.create(
+        this.jda = JDABuilder.create(
                 GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.GUILD_MESSAGE_REACTIONS

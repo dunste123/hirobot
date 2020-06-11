@@ -34,9 +34,9 @@ public class EventManager implements IEventManager {
 
     private final EventListener[] fanServerListeners;
 
-    public EventManager(CommandClient commandClient) {
+    public EventManager(CommandClient commandClient, Hiro bot) {
         fanServerListeners = new EventListener[] {
-                new FanServerEventHandler(),
+                new FanServerEventHandler(bot),
                 (EventListener) commandClient,
         };
     }

@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation(group = "net.dv8tion", name = "JDA", version = "4.1.1_145")
+    implementation(group = "net.dv8tion", name = "JDA", version = "4.1.1_162")
     implementation(group = "com.jagrosh", name = "jda-utilities-command", version = "3.0.3")
     
     implementation(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
@@ -65,5 +65,5 @@ configure<JavaPluginConvention> {
 
 tasks.withType<Wrapper> {
     distributionType = DistributionType.ALL
-    gradleVersion = "5.6.3"
+    gradleVersion = "6.1.1"
 }

@@ -18,6 +18,7 @@
 
 package me.duncte123.hirobot.events;
 
+import me.duncte123.hirobot.Hiro;
 import me.duncte123.hirobot.ReactionHelpers;
 import me.duncte123.hirobot.chat.ChatBot;
 import net.dv8tion.jda.api.JDA;
@@ -34,13 +35,17 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 import static me.duncte123.hirobot.Hiro.*;
 
 public class FanServerEventHandler implements EventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(FanServerEventHandler.class);
-    public static final String[] WELCOME_MESSAGES = {
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private static final String[] WELCOME_MESSAGES = {
             "Hey what's up {user}, welcome to my fanclub <:HiroCheer:670239465259794442>",
             "Hey listen up, {user} just joined",
             "Hey {user}, did u see Keitaro?",
@@ -51,7 +56,22 @@ public class FanServerEventHandler implements EventListener {
             "That's my {user}"
     };
 
+    private static final String[] STREAM_NAMES = {
+        "with Seto",
+        "Portal",
+        "on Twitch",
+        "Camp Buddy",
+        "Minecraft",
+        "something nice ;)",
+    };
+
     private final ChatBot chatbot = new ChatBot();
+
+    private final Hiro hiro;
+
+    public FanServerEventHandler(Hiro hiro) {
+        this.hiro = hiro;
+    }
 
     @Override
     public void onEvent(@Nonnull GenericEvent event) {
@@ -70,6 +90,11 @@ public class FanServerEventHandler implements EventListener {
 
     private void onReady(@Nonnull ReadyEvent event) {
         LOGGER.info("Logged in as {}", event.getJDA().getSelfUser().getAsTag());
+
+        SCHEDULER.scheduleAtFixedRate(() -> {
+            final String message = STREAM_NAMES[ThreadLocalRandom.current().nextInt(STREAM_NAMES.length)];
+            this.hiro.jda.getPresence().setActivity(Activity.streaming(message, "https://twitch.tv/super_hiro69"));
+        }, 0L, 2L, TimeUnit.HOURS);
     }
 
     private void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
