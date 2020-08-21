@@ -37,12 +37,12 @@ public class ValentineCommand extends Command {
 
     private final Database database;
 
-    public ValentineCommand() {
+    public ValentineCommand(Database database) {
         this.name = "valentine";
         this.help = "Who from Camp Buddy is your valentine? Find out via this command";
         this.cooldown = 20;
 
-        this.database = new SQLiteDatabase();
+        this.database = database;
         this.characters = loadCharactersFromFile("valentines.json");
     }
 

@@ -95,6 +95,8 @@ public class FanServerEventHandler implements EventListener {
             final String message = STREAM_NAMES[ThreadLocalRandom.current().nextInt(STREAM_NAMES.length)];
             this.hiro.jda.getPresence().setActivity(Activity.streaming(message, "https://twitch.tv/super_hiro69"));
         }, 0L, 2L, TimeUnit.HOURS);
+
+        this.hiro.initBdayTimer();
     }
 
     private void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {

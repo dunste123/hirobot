@@ -18,6 +18,8 @@
 
 package me.duncte123.hirobot;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -26,6 +28,9 @@ import me.duncte123.hirobot.commands.CVTCommand;
 import me.duncte123.hirobot.commands.DialogCommand;
 import me.duncte123.hirobot.commands.RouteCommand;
 import me.duncte123.hirobot.commands.ValentineCommand;
+import me.duncte123.hirobot.database.Database;
+import me.duncte123.hirobot.database.SQLiteDatabase;
+import me.duncte123.hirobot.database.objects.Birthday;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -37,7 +42,14 @@ import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Hiro {
     public static final String PREFIX = "!!";
@@ -46,12 +58,18 @@ public class Hiro {
     public static final long STANS_ROLE_ID = 670368434017533962L;
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     public static final long ROLES_CHANNEL_ID = 672361818429325312L;
+    public static final long DEV_CHANNEL_ID = 677954714825916427L;
 
     private static final Map<String, String> customEnv = new HashMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public final JDA jda;
 
+    private final Database database;
+
     public Hiro() throws LoginException, IOException {
+        this.database = new SQLiteDatabase();
+
         final CommandClientBuilder builder = new CommandClientBuilder();
 
         ReactionHelpers.load();
@@ -66,7 +84,7 @@ public class Hiro {
         builder.addCommands(
                 new CVTCommand(),
                 new RouteCommand(),
-                new ValentineCommand(),
+                new ValentineCommand(database),
                 new DialogCommand()
         );
 
@@ -83,6 +101,8 @@ public class Hiro {
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
                 .disableCache(EnumSet.allOf(CacheFlag.class))
                 .build();
+
+        this.loadBirthdays();
     }
 
     // Modified code from CommandClientImpl.java of JDA Utils
@@ -133,5 +153,52 @@ public class Hiro {
         }
 
         return env;
+    }
+
+    public void initBdayTimer() {
+        final ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"));
+        ZonedDateTime nextRun = now.withHour(21).withMinute(19).withSecond(0);
+
+        if(now.compareTo(nextRun) > 0) {
+            nextRun = nextRun.plusDays(1);
+        }
+
+        System.out.println(nextRun);
+
+        final Duration duration = Duration.between(now, nextRun);
+        final long initalDelay = duration.getSeconds();
+
+        System.out.println(initalDelay);
+        this.scheduler.scheduleAtFixedRate(() -> {
+                System.out.println("schedule");
+
+                final Birthday birthday = this.database.getBirthday(LocalDate.of(0, 2, 22));
+
+                System.out.println(birthday);
+
+                if (birthday == null) {
+                    return;
+                }
+
+                this.jda.getTextChannelById(DEV_CHANNEL_ID)
+                    // TODO: add funny messages
+                    .sendMessageFormat("It's <@%s>'s birthday", birthday.getUserId())
+                    .queue();
+            },
+            initalDelay,
+            TimeUnit.DAYS.toSeconds(1),
+            TimeUnit.SECONDS
+        );
+    }
+
+    private void loadBirthdays() throws IOException {
+        final var bdayInit = new File("bday.init.json5");
+
+        // TODO: items are duped on boot, delete file?
+        if (bdayInit.exists()) {
+            final List<Birthday> dataArray = ReactionHelpers.MAPPER.readValue(bdayInit, new TypeReference<>() {});
+
+            dataArray.forEach(this.database::addBirthday);
+        }
     }
 }

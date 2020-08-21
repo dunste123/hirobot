@@ -18,9 +18,9 @@
 
 package me.duncte123.hirobot;
 
-import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.hash.TLongLongHashMap;
@@ -33,6 +33,21 @@ import java.io.IOException;
 public class ReactionHelpers {
     // reaction -> role
     private static final TLongLongMap ROLES_MAP = new TLongLongHashMap();
+    public static final JsonMapper MAPPER;
+
+    static {
+        MAPPER = JsonMapper.builder()
+            .disable(
+                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+            )
+            .enable(
+                JsonReadFeature.ALLOW_TRAILING_COMMA,
+                JsonReadFeature.ALLOW_JAVA_COMMENTS,
+                JsonReadFeature.ALLOW_YAML_COMMENTS,
+                JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES
+            )
+            .build();
+    }
 
     /*static {
         // Keitaro
@@ -60,13 +75,7 @@ public class ReactionHelpers {
     }*/
 
     public static void load() throws IOException {
-        final ObjectMapper mapper = new ObjectMapper();
-
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        mapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
-        mapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
-
-        final ObjectNode d = mapper.readValue(new File("roles_map.json5"), ObjectNode.class);
+        final ObjectNode d = (ObjectNode) MAPPER.readTree(new File("roles_map.json5"));
 
         d.fieldNames().forEachRemaining((key) -> {
             final long longKey = Long.parseLong(key);

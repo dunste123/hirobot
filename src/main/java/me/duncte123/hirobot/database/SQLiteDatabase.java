@@ -20,12 +20,16 @@ package me.duncte123.hirobot.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import me.duncte123.hirobot.database.objects.Birthday;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 public class SQLiteDatabase implements Database {
@@ -65,6 +69,12 @@ public class SQLiteDatabase implements Database {
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "user_id VARCHAR(20) NOT NULL," +
                         "buddy_index int(2) NOT NULL DEFAULT -1" +
+                        ");");
+                // language=SQLite
+                statement.execute("CREATE TABLE IF NOT EXISTS birthdays (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "user_id VARCHAR(20) NOT NULL," +
+                        "date VARCHAR(5) NOT NULL" +
                         ");");
 
                 LOGGER.info("Table initialised");
@@ -124,5 +134,56 @@ public class SQLiteDatabase implements Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void addBirthday(@NotNull Birthday birthday) {
+        try (final Connection conn = ds.getConnection()) {
+            try (final PreparedStatement smt =
+                     // language=SQLite
+                     conn.prepareStatement("INSERT OR IGNORE INTO birthdays (user_id, date) VALUES(? , ?)")) {
+
+                final LocalDate date = birthday.getDate();
+
+                smt.setLong(1, birthday.getUserId());
+                smt.setString(2, pre0(date.getMonthValue()) + '-' + pre0(date.getDayOfMonth()));
+
+                smt.execute();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Nullable
+    @Override
+    public Birthday getBirthday(LocalDate date) {
+        System.out.println("getBirthday");
+        System.out.println(date);
+
+        try (final Connection conn = ds.getConnection()) {
+            try (final PreparedStatement smt =
+                     // language=SQLite
+                     conn.prepareStatement("SELECT * FROM birthdays WHERE date = ?")) {
+                smt.setString(1, pre0(date.getMonthValue()) + '-' + pre0(date.getDayOfMonth()));
+
+                try (final ResultSet resultSet = smt.executeQuery()) {
+                    if (resultSet.next()) {
+                        return new Birthday(
+                            resultSet.getLong("user_id"),
+                            resultSet.getString("date")
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private String pre0(int in) {
+        return in < 10 ? "0" + in : String.valueOf(in);
     }
 }
