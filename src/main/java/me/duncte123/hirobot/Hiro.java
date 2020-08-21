@@ -157,7 +157,7 @@ public class Hiro {
 
     public void initBdayTimer() {
         final ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"));
-        ZonedDateTime nextRun = now.withHour(21).withMinute(19).withSecond(0);
+        ZonedDateTime nextRun = now.withHour(18).withMinute(0).withSecond(0);
 
         if(now.compareTo(nextRun) > 0) {
             nextRun = nextRun.plusDays(1);

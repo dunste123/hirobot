@@ -73,7 +73,7 @@ public class SQLiteDatabase implements Database {
                 // language=SQLite
                 statement.execute("CREATE TABLE IF NOT EXISTS birthdays (" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "user_id VARCHAR(20) NOT NULL," +
+                        "user_id VARCHAR(20) NOT NULL UNIQUE," +
                         "date VARCHAR(5) NOT NULL" +
                         ");");
 
