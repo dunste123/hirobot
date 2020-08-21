@@ -29,4 +29,6 @@ public interface Database {
      */
     int getValentine(long userId);
 
+    void clearValentines();
+
 }

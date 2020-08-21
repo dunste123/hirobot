@@ -112,4 +112,17 @@ public class SQLiteDatabase implements Database {
 
         return -1;
     }
+
+    @Override
+    @SuppressWarnings("SqlWithoutWhere")
+    public void clearValentines() {
+        try (final Connection conn = ds.getConnection()) {
+            try (final Statement smt = conn.createStatement()) {
+                // language=SQLite
+                smt.execute("DELETE FROM valentines");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
