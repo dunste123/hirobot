@@ -19,7 +19,6 @@
 package me.duncte123.hirobot;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -42,14 +41,7 @@ import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Hiro {
     public static final String PREFIX = "!!";
@@ -61,7 +53,6 @@ public class Hiro {
     public static final long DEV_CHANNEL_ID = 677954714825916427L;
 
     private static final Map<String, String> customEnv = new HashMap<>();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public final JDA jda;
 
@@ -89,7 +80,7 @@ public class Hiro {
         );
 
         final CommandClient commandClient = builder.build();
-        final EventManager eventManager = new EventManager(commandClient, this);
+        final EventManager eventManager = new EventManager(commandClient, this, database);
 
         this.jda = JDABuilder.create(
                 GatewayIntent.GUILD_MEMBERS,
@@ -153,42 +144,6 @@ public class Hiro {
         }
 
         return env;
-    }
-
-    public void initBdayTimer() {
-        final ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"));
-        ZonedDateTime nextRun = now.withHour(18).withMinute(0).withSecond(0);
-
-        if(now.compareTo(nextRun) > 0) {
-            nextRun = nextRun.plusDays(1);
-        }
-
-        System.out.println(nextRun);
-
-        final Duration duration = Duration.between(now, nextRun);
-        final long initalDelay = duration.getSeconds();
-
-        System.out.println(initalDelay);
-        this.scheduler.scheduleAtFixedRate(() -> {
-                System.out.println("schedule");
-
-                final Birthday birthday = this.database.getBirthday(LocalDate.of(0, 2, 22));
-
-                System.out.println(birthday);
-
-                if (birthday == null) {
-                    return;
-                }
-
-                this.jda.getTextChannelById(DEV_CHANNEL_ID)
-                    // TODO: add funny messages
-                    .sendMessageFormat("It's <@%s>'s birthday", birthday.getUserId())
-                    .queue();
-            },
-            initalDelay,
-            TimeUnit.DAYS.toSeconds(1),
-            TimeUnit.SECONDS
-        );
     }
 
     private void loadBirthdays() throws IOException {

@@ -21,6 +21,8 @@ package me.duncte123.hirobot.events;
 import me.duncte123.hirobot.Hiro;
 import me.duncte123.hirobot.ReactionHelpers;
 import me.duncte123.hirobot.chat.ChatBot;
+import me.duncte123.hirobot.database.Database;
+import me.duncte123.hirobot.database.objects.Birthday;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -34,6 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,7 +50,7 @@ import static me.duncte123.hirobot.Hiro.*;
 
 public class FanServerEventHandler implements EventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(FanServerEventHandler.class);
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
     private static final String[] WELCOME_MESSAGES = {
             "Hey what's up {user}, welcome to my fanclub <:HiroCheer:670239465259794442>",
             "Hey listen up, {user} just joined",
@@ -65,12 +71,22 @@ public class FanServerEventHandler implements EventListener {
         "something nice ;)",
     };
 
+    private static final String[] BDAY_MESSAGES = {
+        "It's <@%s>'s birthday!!!",
+        "Hey hey hey, can we get a happy birthday for <@%s>",
+        "HAPPY BIRTHDAY TO <@%s>!!!",
+        "Hey listen up! It's <@%s>'s birthday today",
+        "Hey listen! It's <@%s>'s bday today!",
+    };
+
     private final ChatBot chatbot = new ChatBot();
 
     private final Hiro hiro;
+    private final Database database;
 
-    public FanServerEventHandler(Hiro hiro) {
+    public FanServerEventHandler(Hiro hiro, Database database) {
         this.hiro = hiro;
+        this.database = database;
     }
 
     @Override
@@ -91,12 +107,12 @@ public class FanServerEventHandler implements EventListener {
     private void onReady(@Nonnull ReadyEvent event) {
         LOGGER.info("Logged in as {}", event.getJDA().getSelfUser().getAsTag());
 
-        SCHEDULER.scheduleAtFixedRate(() -> {
+        scheduler.scheduleAtFixedRate(() -> {
             final String message = STREAM_NAMES[ThreadLocalRandom.current().nextInt(STREAM_NAMES.length)];
             this.hiro.jda.getPresence().setActivity(Activity.streaming(message, "https://twitch.tv/super_hiro69"));
         }, 0L, 2L, TimeUnit.HOURS);
 
-        this.hiro.initBdayTimer();
+        this.initBdayTimer();
     }
 
     private void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
@@ -169,5 +185,38 @@ public class FanServerEventHandler implements EventListener {
                     event
             );
         }
+    }
+
+    public void initBdayTimer() {
+//        final ZoneId zone = ZoneId.of("Europe/Amsterdam");
+        final ZoneId zone = ZoneId.of("GMT");
+        final ZonedDateTime now = ZonedDateTime.now(zone);
+        ZonedDateTime nextRun = now.withHour(12).withMinute(0).withSecond(0);
+
+        if(now.compareTo(nextRun) > 0) {
+            nextRun = nextRun.plusDays(1);
+        }
+
+        final Duration duration = Duration.between(now, nextRun);
+        final long initalDelay = duration.getSeconds();
+
+        this.scheduler.scheduleAtFixedRate(() -> {
+                final Birthday birthday = this.database.getBirthday(LocalDate.now(zone));
+
+                if (birthday == null) {
+                    return;
+                }
+
+                final int i = ThreadLocalRandom.current().nextInt(BDAY_MESSAGES.length);
+
+                //noinspection ConstantConditions
+                this.hiro.jda.getTextChannelById(DEV_CHANNEL_ID)
+                    .sendMessageFormat(BDAY_MESSAGES[i], birthday.getUserId())
+                    .queue();
+            },
+            initalDelay,
+            TimeUnit.DAYS.toSeconds(1),
+            TimeUnit.SECONDS
+        );
     }
 }

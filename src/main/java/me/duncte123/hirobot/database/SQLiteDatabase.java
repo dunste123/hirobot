@@ -158,9 +158,6 @@ public class SQLiteDatabase implements Database {
     @Nullable
     @Override
     public Birthday getBirthday(LocalDate date) {
-        System.out.println("getBirthday");
-        System.out.println(date);
-
         try (final Connection conn = ds.getConnection()) {
             try (final PreparedStatement smt =
                      // language=SQLite
