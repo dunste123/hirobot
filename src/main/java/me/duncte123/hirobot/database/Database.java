@@ -18,6 +18,12 @@
 
 package me.duncte123.hirobot.database;
 
+import me.duncte123.hirobot.database.objects.Birthday;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.time.LocalDate;
+
 public interface Database {
 
     void setValentine(long userId, int buddyIndex);
@@ -29,4 +35,10 @@ public interface Database {
      */
     int getValentine(long userId);
 
+    void clearValentines();
+
+    void addBirthday(@Nonnull Birthday birthday);
+
+    @Nullable
+    Birthday getBirthday(LocalDate date);
 }

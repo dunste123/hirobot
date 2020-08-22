@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.entities.Member;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import static me.duncte123.hirobot.Hiro.OWNER_ID;
 import static me.duncte123.hirobot.Utils.getUserStaticAvatarUrl;
 import static me.duncte123.hirobot.Utils.loadCharactersFromFile;
 
@@ -36,12 +37,12 @@ public class ValentineCommand extends Command {
 
     private final Database database;
 
-    public ValentineCommand() {
+    public ValentineCommand(Database database) {
         this.name = "valentine";
         this.help = "Who from Camp Buddy is your valentine? Find out via this command";
         this.cooldown = 20;
 
-        this.database = new SQLiteDatabase();
+        this.database = database;
         this.characters = loadCharactersFromFile("valentines.json");
     }
 
@@ -49,6 +50,13 @@ public class ValentineCommand extends Command {
     protected void execute(CommandEvent event) {
         final Member member = event.getMember();
         final long userId = member.getIdLong();
+
+        if (!event.getArgs().isEmpty() && "clear".equals(event.getArgs()) && userId == OWNER_ID) {
+            this.database.clearValentines();
+            event.reply("Cleared valentines");
+            return;
+        }
+
         int valentineIndex = this.database.getValentine(userId);
 
         if (valentineIndex == -1) {

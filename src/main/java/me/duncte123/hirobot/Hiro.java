@@ -18,6 +18,7 @@
 
 package me.duncte123.hirobot;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -26,6 +27,9 @@ import me.duncte123.hirobot.commands.CVTCommand;
 import me.duncte123.hirobot.commands.DialogCommand;
 import me.duncte123.hirobot.commands.RouteCommand;
 import me.duncte123.hirobot.commands.ValentineCommand;
+import me.duncte123.hirobot.database.Database;
+import me.duncte123.hirobot.database.SQLiteDatabase;
+import me.duncte123.hirobot.database.objects.Birthday;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -46,12 +50,17 @@ public class Hiro {
     public static final long STANS_ROLE_ID = 670368434017533962L;
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     public static final long ROLES_CHANNEL_ID = 672361818429325312L;
+    public static final long DEV_CHANNEL_ID = 677954714825916427L;
 
     private static final Map<String, String> customEnv = new HashMap<>();
 
     public final JDA jda;
 
+    private final Database database;
+
     public Hiro() throws LoginException, IOException {
+        this.database = new SQLiteDatabase();
+
         final CommandClientBuilder builder = new CommandClientBuilder();
 
         ReactionHelpers.load();
@@ -66,12 +75,12 @@ public class Hiro {
         builder.addCommands(
                 new CVTCommand(),
                 new RouteCommand(),
-                new ValentineCommand(),
+                new ValentineCommand(database),
                 new DialogCommand()
         );
 
         final CommandClient commandClient = builder.build();
-        final EventManager eventManager = new EventManager(commandClient, this);
+        final EventManager eventManager = new EventManager(commandClient, this, database);
 
         this.jda = JDABuilder.create(
                 GatewayIntent.GUILD_MEMBERS,
@@ -83,6 +92,8 @@ public class Hiro {
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
                 .disableCache(EnumSet.allOf(CacheFlag.class))
                 .build();
+
+        this.loadBirthdays();
     }
 
     // Modified code from CommandClientImpl.java of JDA Utils
@@ -133,5 +144,16 @@ public class Hiro {
         }
 
         return env;
+    }
+
+    private void loadBirthdays() throws IOException {
+        final var bdayInit = new File("bday.init.json5");
+
+        // TODO: items are duped on boot, delete file?
+        if (bdayInit.exists()) {
+            final List<Birthday> dataArray = ReactionHelpers.MAPPER.readValue(bdayInit, new TypeReference<>() {});
+
+            dataArray.forEach(this.database::addBirthday);
+        }
     }
 }
