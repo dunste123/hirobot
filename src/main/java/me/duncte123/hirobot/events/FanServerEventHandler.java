@@ -210,7 +210,7 @@ public class FanServerEventHandler implements EventListener {
                 final int i = ThreadLocalRandom.current().nextInt(BDAY_MESSAGES.length);
 
                 //noinspection ConstantConditions
-                this.hiro.jda.getTextChannelById(DEV_CHANNEL_ID)
+                this.hiro.jda.getTextChannelById(GENERAL_CHANNEL_ID)
                     .sendMessageFormat(BDAY_MESSAGES[i], birthday.getUserId())
                     .queue();
             },
