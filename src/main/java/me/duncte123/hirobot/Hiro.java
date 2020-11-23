@@ -23,10 +23,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.duncte123.hirobot.commands.CVTCommand;
-import me.duncte123.hirobot.commands.DialogCommand;
-import me.duncte123.hirobot.commands.RouteCommand;
-import me.duncte123.hirobot.commands.ValentineCommand;
+import me.duncte123.hirobot.commands.*;
 import me.duncte123.hirobot.database.Database;
 import me.duncte123.hirobot.database.SQLiteDatabase;
 import me.duncte123.hirobot.database.objects.Birthday;
@@ -51,11 +48,8 @@ public class Hiro {
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     public static final long ROLES_CHANNEL_ID = 672361818429325312L;
     public static final long DEV_CHANNEL_ID = 677954714825916427L;
-
-    private static final Map<String, String> customEnv = new HashMap<>();
-
     public final JDA jda;
-
+    private static final Map<String, String> customEnv = new HashMap<>();
     private final Database database;
 
     public Hiro() throws LoginException, IOException {
@@ -73,25 +67,26 @@ public class Hiro {
         builder.setHelpConsumer(this::helpConsumer);
 
         builder.addCommands(
-                new CVTCommand(),
-                new RouteCommand(),
-                new ValentineCommand(database),
-                new DialogCommand()
+            new CVTCommand(),
+            new RouteCommand(),
+            new BdaysCommand(database),
+            new ValentineCommand(database),
+            new DialogCommand()
         );
 
         final CommandClient commandClient = builder.build();
         final EventManager eventManager = new EventManager(commandClient, this, database);
 
         this.jda = JDABuilder.create(
-                GatewayIntent.GUILD_MEMBERS,
-                GatewayIntent.GUILD_MESSAGES,
-                GatewayIntent.GUILD_MESSAGE_REACTIONS
+            GatewayIntent.GUILD_MEMBERS,
+            GatewayIntent.GUILD_MESSAGES,
+            GatewayIntent.GUILD_MESSAGE_REACTIONS
         )
-                .setToken(customEnv.get("TOKEN"))
-                .setEventManager(eventManager)
-                .setMemberCachePolicy(MemberCachePolicy.NONE)
-                .disableCache(EnumSet.allOf(CacheFlag.class))
-                .build();
+            .setToken(customEnv.get("TOKEN"))
+            .setEventManager(eventManager)
+            .setMemberCachePolicy(MemberCachePolicy.NONE)
+            .disableCache(EnumSet.allOf(CacheFlag.class))
+            .build();
 
         this.loadBirthdays();
     }
@@ -113,8 +108,8 @@ public class Hiro {
                     builder.append("\n\n  __").append(category == null ? "No Category" : category.getName()).append("__:\n");
                 }
                 builder.append("\n`").append(textPrefix).append(prefix == null ? " " : "").append(command.getName())
-                        .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
-                        .append(" - ").append(command.getHelp());
+                    .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
+                    .append(" - ").append(command.getHelp());
             }
         }
 
@@ -123,6 +118,16 @@ public class Hiro {
                 event.reactSuccess();
             }
         }, (t) -> event.replyWarning("Help cannot be sent because you are blocking Direct Messages."));
+    }
+
+    private void loadBirthdays() throws IOException {
+        final var bdayInit = new File("bday.init.json5");
+
+        if (bdayInit.exists()) {
+            final List<Birthday> dataArray = ReactionHelpers.MAPPER.readValue(bdayInit, new TypeReference<>() {});
+
+            dataArray.forEach(this.database::addBirthday);
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -144,16 +149,5 @@ public class Hiro {
         }
 
         return env;
-    }
-
-    private void loadBirthdays() throws IOException {
-        final var bdayInit = new File("bday.init.json5");
-
-        // TODO: items are duped on boot, delete file?
-        if (bdayInit.exists()) {
-            final List<Birthday> dataArray = ReactionHelpers.MAPPER.readValue(bdayInit, new TypeReference<>() {});
-
-            dataArray.forEach(this.database::addBirthday);
-        }
     }
 }

@@ -23,6 +23,7 @@ import me.duncte123.hirobot.database.objects.Birthday;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.LocalDate;
+import java.util.List;
 
 public interface Database {
 
@@ -37,7 +38,11 @@ public interface Database {
 
     void clearValentines();
 
+    List<Birthday> getBirthdays();
+
     void addBirthday(@Nonnull Birthday birthday);
+
+    void removeBirthday(long userId);
 
     @Nullable
     Birthday getBirthday(LocalDate date);

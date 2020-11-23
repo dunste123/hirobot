@@ -30,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class SQLiteDatabase implements Database {
@@ -66,16 +68,16 @@ public class SQLiteDatabase implements Database {
             try (final Statement statement = conn.createStatement()) {
                 // language=SQLite
                 statement.execute("CREATE TABLE IF NOT EXISTS valentines (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "user_id VARCHAR(20) NOT NULL," +
-                        "buddy_index int(2) NOT NULL DEFAULT -1" +
-                        ");");
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "user_id VARCHAR(20) NOT NULL," +
+                    "buddy_index int(2) NOT NULL DEFAULT -1" +
+                    ");");
                 // language=SQLite
                 statement.execute("CREATE TABLE IF NOT EXISTS birthdays (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "user_id VARCHAR(20) NOT NULL UNIQUE," +
-                        "date VARCHAR(5) NOT NULL" +
-                        ");");
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "user_id VARCHAR(20) NOT NULL UNIQUE," +
+                    "date VARCHAR(5) NOT NULL" +
+                    ");");
 
                 LOGGER.info("Table initialised");
             }
@@ -88,8 +90,8 @@ public class SQLiteDatabase implements Database {
     public void setValentine(long userId, int buddyIndex) {
         try (final Connection conn = ds.getConnection()) {
             try (final PreparedStatement preparedStatement = conn.prepareStatement(
-                    // language=SQLite
-                    "INSERT INTO valentines(buddy_index, user_id) VALUES(? , ?)"
+                // language=SQLite
+                "INSERT INTO valentines(buddy_index, user_id) VALUES(? , ?)"
             )) {
                 preparedStatement.setInt(1, buddyIndex);
                 preparedStatement.setString(2, String.valueOf(userId));
@@ -105,8 +107,8 @@ public class SQLiteDatabase implements Database {
     public int getValentine(long userId) {
         try (final Connection conn = ds.getConnection()) {
             try (final PreparedStatement preparedStatement = conn.prepareStatement(
-                    // language=SQLite
-                    "SELECT buddy_index FROM valentines WHERE user_id = ?"
+                // language=SQLite
+                "SELECT buddy_index FROM valentines WHERE user_id = ?"
             )) {
                 preparedStatement.setString(1, String.valueOf(userId));
 
@@ -137,6 +139,28 @@ public class SQLiteDatabase implements Database {
     }
 
     @Override
+    public List<Birthday> getBirthdays() {
+        final List<Birthday> birthdays = new ArrayList<>();
+
+        try (final Connection conn = ds.getConnection()) {
+            try (final Statement smt = conn.createStatement()) {
+                try (final ResultSet resultSet = smt.executeQuery("SELECT * FROM birthdays")) {
+                    while (resultSet.next()) {
+                        birthdays.add(new Birthday(
+                            resultSet.getLong("user_id"),
+                            resultSet.getString("date")
+                        ));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return birthdays;
+    }
+
+    @Override
     public void addBirthday(@NotNull Birthday birthday) {
         try (final Connection conn = ds.getConnection()) {
             try (final PreparedStatement smt =
@@ -149,6 +173,22 @@ public class SQLiteDatabase implements Database {
                 smt.setString(2, pre0(date.getMonthValue()) + '-' + pre0(date.getDayOfMonth()));
 
                 smt.execute();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void removeBirthday(long userId) {
+        try (final Connection conn = ds.getConnection()) {
+            try (final PreparedStatement smt =
+                     // language=SQLite
+                     conn.prepareStatement("DELETE FROM birthdays WHERE user_id = ?")) {
+                smt.setLong(1, userId);
+
+                smt.executeUpdate();
+                smt.closeOnCompletion();
             }
         } catch (SQLException e) {
             e.printStackTrace();
