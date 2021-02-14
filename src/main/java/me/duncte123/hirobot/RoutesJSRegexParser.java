@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 public class RoutesJSRegexParser {
 
     public static void main(String[] args) throws Exception {
-        File input = new File("routes-raw.json");
-        File output = new File("valentines.json");
+        File input = new File("./data/routes-raw.json");
+        File output = new File("./data/valentines.json");
 
         String content = Files.readString(input.toPath());
 

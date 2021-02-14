@@ -20,7 +20,6 @@ package me.duncte123.hirobot.events;
 
 import me.duncte123.hirobot.Hiro;
 import me.duncte123.hirobot.ReactionHelpers;
-import me.duncte123.hirobot.chat.ChatBot;
 import me.duncte123.hirobot.database.Database;
 import me.duncte123.hirobot.database.objects.Birthday;
 import net.dv8tion.jda.api.JDA;
@@ -68,7 +67,7 @@ public class FanServerEventHandler implements EventListener {
         "on Twitch",
         "Camp Buddy",
         "Minecraft",
-        "something nice ;)",
+        ";)",
     };
 
     private static final String[] BDAY_MESSAGES = {
@@ -78,8 +77,6 @@ public class FanServerEventHandler implements EventListener {
         "Hey listen up! It's <@%s>'s birthday today",
         "Hey listen! It's <@%s>'s bday today!",
     };
-
-    private final ChatBot chatbot = new ChatBot();
 
     private final Hiro hiro;
     private final Database database;
@@ -170,20 +167,6 @@ public class FanServerEventHandler implements EventListener {
             jda.getHttpClient().dispatcher().executorService().shutdown();
 
             System.exit(0);
-
-            return;
-        }
-
-        final SelfUser selfUser = event.getJDA().getSelfUser();
-        final String selfId = selfUser.getId();
-        final String selfMemberMention = "<@!" + selfId + '>';
-        final String selfUserMention = selfUser.getAsMention();
-
-        if (contentRaw.startsWith(selfMemberMention) || contentRaw.startsWith(selfUserMention)) {
-            this.chatbot.handleInput(
-                    contentRaw.replaceFirst("<@!?" + selfId + '>', "").trim(),
-                    event
-            );
         }
     }
 
@@ -193,30 +176,35 @@ public class FanServerEventHandler implements EventListener {
         final ZonedDateTime now = ZonedDateTime.now(zone);
         ZonedDateTime nextRun = now.withHour(12).withMinute(0).withSecond(0);
 
+        // if now is greather then the next run
+        // do a BDay pull right away and set the nextRun a day in the future
         if(now.compareTo(nextRun) > 0) {
+            handleBirthday(zone);
             nextRun = nextRun.plusDays(1);
         }
 
         final Duration duration = Duration.between(now, nextRun);
         final long initalDelay = duration.getSeconds();
 
-        this.scheduler.scheduleAtFixedRate(() -> {
-                final Birthday birthday = this.database.getBirthday(LocalDate.now(zone));
-
-                if (birthday == null) {
-                    return;
-                }
-
-                final int i = ThreadLocalRandom.current().nextInt(BDAY_MESSAGES.length);
-
-                //noinspection ConstantConditions
-                this.hiro.jda.getTextChannelById(GENERAL_CHANNEL_ID)
-                    .sendMessageFormat(BDAY_MESSAGES[i], birthday.getUserId())
-                    .queue();
-            },
+        this.scheduler.scheduleAtFixedRate(() -> handleBirthday(zone),
             initalDelay,
             TimeUnit.DAYS.toSeconds(1),
             TimeUnit.SECONDS
         );
+    }
+
+    private void handleBirthday(ZoneId zone) {
+        final Birthday birthday = this.database.getBirthday(LocalDate.now(zone));
+
+        if (birthday == null) {
+            return;
+        }
+
+        final int i = ThreadLocalRandom.current().nextInt(BDAY_MESSAGES.length);
+
+        //noinspection ConstantConditions
+        this.hiro.jda.getTextChannelById(GENERAL_CHANNEL_ID)
+            .sendMessageFormat(BDAY_MESSAGES[i], birthday.getUserId())
+            .queue();
     }
 }

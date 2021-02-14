@@ -44,7 +44,7 @@ public class RouteCommand extends Command {
         this.cooldown = 10;
         this.cooldownScope = CooldownScope.GUILD; // USER is default
 
-        this.characters = loadCharactersFromFile("routes.json");
+        this.characters = loadCharactersFromFile("./data/routes.json");
     }
 
     @Override

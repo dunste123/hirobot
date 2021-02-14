@@ -29,7 +29,6 @@ import me.duncte123.hirobot.database.SQLiteDatabase;
 import me.duncte123.hirobot.database.objects.Birthday;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -113,15 +112,11 @@ public class Hiro {
             }
         }
 
-        event.reply(builder.toString(), (unused) -> {
-            if (event.isFromType(ChannelType.TEXT)) {
-                event.reactSuccess();
-            }
-        }, (t) -> event.replyWarning("Help cannot be sent because you are blocking Direct Messages."));
+        event.reply(builder.toString());
     }
 
     private void loadBirthdays() throws IOException {
-        final var bdayInit = new File("bday.init.json5");
+        final var bdayInit = new File("./data/bday.init.json5");
 
         if (bdayInit.exists()) {
             final List<Birthday> dataArray = ReactionHelpers.MAPPER.readValue(bdayInit, new TypeReference<>() {});
@@ -143,6 +138,11 @@ public class Hiro {
         final List<String> lines = Files.readAllLines(new File(".env").toPath());
 
         for (String line : lines) {
+            // ignore comments
+            if (line.startsWith("#")) {
+                continue;
+            }
+
             final String[] kv = line.split("=");
 
             env.put(kv[0], kv[1]);

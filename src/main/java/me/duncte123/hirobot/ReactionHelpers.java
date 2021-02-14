@@ -75,7 +75,7 @@ public class ReactionHelpers {
     }*/
 
     public static void load() throws IOException {
-        final ObjectNode d = (ObjectNode) MAPPER.readTree(new File("roles_map.json5"));
+        final ObjectNode d = (ObjectNode) MAPPER.readTree(new File("./data/roles_map.json5"));
 
         d.fieldNames().forEachRemaining((key) -> {
             final long longKey = Long.parseLong(key);

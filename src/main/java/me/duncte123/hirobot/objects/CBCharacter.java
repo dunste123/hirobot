@@ -46,7 +46,7 @@ public class CBCharacter {
     }
 
     public String getFirstName() {
-        return name.split("\\s+")[0];
+        return name.substring(0, name.indexOf(' '));
     }
 
     public String getDescription() {

@@ -39,9 +39,9 @@ public class SQLiteDatabase implements Database {
     private final HikariDataSource ds;
 
     public SQLiteDatabase() {
-        try {
-            final File dbFile = new File("database.db");
+        final File dbFile = new File("./data/database.db");
 
+        try {
             if (!dbFile.exists()) {
                 if (dbFile.createNewFile()) {
                     LOGGER.info("Created database file");
@@ -55,7 +55,7 @@ public class SQLiteDatabase implements Database {
         }
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:sqlite:database.db");
+        config.setJdbcUrl("jdbc:sqlite:" + dbFile);
         config.setConnectionTestQuery("SELECT 1");
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
@@ -144,7 +144,9 @@ public class SQLiteDatabase implements Database {
 
         try (final Connection conn = ds.getConnection()) {
             try (final Statement smt = conn.createStatement()) {
-                try (final ResultSet resultSet = smt.executeQuery("SELECT * FROM birthdays")) {
+                try (final ResultSet resultSet =
+                         // language=SQLite
+                         smt.executeQuery("SELECT * FROM birthdays")) {
                     while (resultSet.next()) {
                         birthdays.add(new Birthday(
                             resultSet.getLong("user_id"),

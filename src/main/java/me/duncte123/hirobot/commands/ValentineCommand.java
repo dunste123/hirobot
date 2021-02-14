@@ -21,7 +21,6 @@ package me.duncte123.hirobot.commands;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.duncte123.hirobot.database.Database;
-import me.duncte123.hirobot.database.SQLiteDatabase;
 import me.duncte123.hirobot.objects.CBCharacter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -43,7 +42,7 @@ public class ValentineCommand extends Command {
         this.cooldown = 20;
 
         this.database = database;
-        this.characters = loadCharactersFromFile("valentines.json");
+        this.characters = loadCharactersFromFile("./data/valentines.json");
     }
 
     @Override

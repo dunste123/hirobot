@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation(group = "net.dv8tion", name = "JDA", version = "4.2.0_221")
+    implementation(group = "net.dv8tion", name = "JDA", version = "4.2.0_227")
     implementation(group = "com.jagrosh", name = "jda-utilities-command", version = "3.0.4")
     
     implementation(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
@@ -48,8 +48,6 @@ dependencies {
 
     implementation(group = "com.zaxxer", name = "HikariCP", version = "3.4.1")
     implementation(group = "org.xerial", name = "sqlite-jdbc", version = "3.30.1")
-
-    implementation(group = "com.google.cloud", name = "google-cloud-dialogflow", version = "2.0.0")
 
 }
 
@@ -65,5 +63,5 @@ configure<JavaPluginConvention> {
 
 tasks.withType<Wrapper> {
     distributionType = DistributionType.ALL
-    gradleVersion = "6.1.1"
+    gradleVersion = "6.8"
 }
