@@ -1,6 +1,6 @@
 /*
  * Custom bot for the Hiro Akiba fan server on discord
- * Copyright (C) 2020 Duncan "duncte123" Sterken
+ * Copyright (C) 2021 Duncan "duncte123" Sterken
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
