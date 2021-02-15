@@ -120,20 +120,6 @@ public class ConvertHelpers {
         return convert(input, inputUnit, INCH);
     }
 
-    /*private static double convertTemperature(double input, Unit<Temperature> sourceUnit, Unit<Temperature> targetUnit) {
-        final UnitConverter converter = sourceUnit.getConverterTo(targetUnit);
-        final double measure = Measure.valueOf(input, sourceUnit).doubleValue(sourceUnit);
-
-        return converter.convert(measure);
-    }
-
-    private static double convertLength(double input, Unit<Length> sourceUnit, Unit<Length> targetUnit) {
-        final UnitConverter converter = sourceUnit.getConverterTo(targetUnit);
-        final double measure = Measure.valueOf(input, sourceUnit).doubleValue(sourceUnit);
-
-        return converter.convert(measure);
-    }*/
-
     @SuppressWarnings("unchecked")
     private static double convert(double input, Unit<? extends Quantity> sourceUnit, Unit<? extends Quantity> targetUnit) {
         final UnitConverter converter = sourceUnit.getConverterTo(targetUnit);

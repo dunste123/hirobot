@@ -27,6 +27,7 @@ import me.duncte123.hirobot.commands.*;
 import me.duncte123.hirobot.database.Database;
 import me.duncte123.hirobot.database.SQLiteDatabase;
 import me.duncte123.hirobot.database.objects.Birthday;
+import me.duncte123.hirobot.events.FanServerEventHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -66,15 +67,10 @@ public class Hiro {
         builder.setHelpConsumer(this::helpConsumer);
 
         builder.addCommands(
-            new CVTCommand(),
-            new RouteCommand(),
-            new BdaysCommand(database),
-            new ValentineCommand(database),
-            new DialogCommand()
+            new BdaysCommand(database)
         );
 
         final CommandClient commandClient = builder.build();
-        final EventManager eventManager = new EventManager(commandClient, this, database);
 
         this.jda = JDABuilder.create(
             GatewayIntent.GUILD_MEMBERS,
@@ -82,7 +78,10 @@ public class Hiro {
             GatewayIntent.GUILD_MESSAGE_REACTIONS
         )
             .setToken(customEnv.get("TOKEN"))
-            .setEventManager(eventManager)
+            .addEventListeners(
+                new FanServerEventHandler(this, database),
+                commandClient
+            )
             .setMemberCachePolicy(MemberCachePolicy.NONE)
             .disableCache(EnumSet.allOf(CacheFlag.class))
             .build();

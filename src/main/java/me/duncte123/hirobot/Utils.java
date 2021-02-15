@@ -54,17 +54,13 @@ public class Utils {
     }
 
     public static CBCharacter[] loadCharactersFromFile(String fileName) {
-        return loadCharactersFromFile(fileName, 0);
-    }
-
-    public static CBCharacter[] loadCharactersFromFile(String fileName, int what) {
         CBCharacter[] tmp = null;
 
         try {
             final File file = new File(fileName);
             final DataArray dataArray = DataArray.fromJson(Files.readString(file.toPath()));
 
-            final int len = dataArray.length() - what;
+            final int len = dataArray.length();
             tmp = new CBCharacter[len];
 
             for (int i = 0; i < len; i++) {
