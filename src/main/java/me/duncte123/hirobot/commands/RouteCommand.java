@@ -22,11 +22,9 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import me.duncte123.hirobot.objects.CBCharacter;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import static me.duncte123.hirobot.Utils.getUserStaticAvatarUrl;
 import static me.duncte123.hirobot.Utils.loadCharactersFromFile;
 
 public class RouteCommand extends Command {
@@ -51,9 +49,6 @@ public class RouteCommand extends Command {
     protected void execute(CommandEvent event) {
         final CBCharacter randomCharacter = getRandomCharacter();
         final EmbedBuilder embed = generateEmbed(randomCharacter);
-        final Member member = event.getMember();
-
-        embed.setAuthor(member.getEffectiveName(), null, getUserStaticAvatarUrl(member.getUser()));
 
         event.reply(embed.build());
     }

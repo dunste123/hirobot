@@ -29,7 +29,6 @@ version = "1.0-SNAPSHOT"
 
 application {
     mainClassName = "$group.hirobot.Hiro"
-//    mainClassName = "$group.hirobot.RoutesJSRegexParser"
 }
 
 repositories {
@@ -43,7 +42,6 @@ dependencies {
     implementation(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
 
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.3")
-    implementation(group = "org.jscience", name = "jscience", version = "4.3.1")
     implementation(group = "net.sf.trove4j", name = "trove4j", version = "3.0.3")
 
     implementation(group = "com.zaxxer", name = "HikariCP", version = "3.4.1")

@@ -20,8 +20,6 @@ package me.duncte123.hirobot.objects;
 
 import net.dv8tion.jda.api.utils.data.DataObject;
 
-import static me.duncte123.hirobot.Utils.hexStringToInt;
-
 public class CBCharacter {
     private final String name;
     private final String description;
@@ -31,13 +29,13 @@ public class CBCharacter {
     private final int color;
     private final String emoteId;
 
-    public CBCharacter(String name, String description, int age, String birthday, String animal, String color, String emoteId) {
+    public CBCharacter(String name, String description, int age, String birthday, String animal, int color, String emoteId) {
         this.name = name;
         this.description = description;
         this.age = age;
         this.birthday = birthday;
         this.animal = animal;
-        this.color = hexStringToInt(color);
+        this.color = color;
         this.emoteId = emoteId;
     }
 
@@ -77,10 +75,6 @@ public class CBCharacter {
         return "https://cdn.discordapp.com/emojis/" + getEmoteId() + ".gif?v=1";
     }
 
-    public String getEmoteUrlPng() {
-        return "https://cdn.discordapp.com/emojis/" + getEmoteId() + ".png?v=1";
-    }
-
     public static CBCharacter fromData(DataObject data) {
         return new CBCharacter(
                 data.getString("name"),
@@ -88,7 +82,7 @@ public class CBCharacter {
                 data.getInt("age"),
                 data.getString("birthday"),
                 data.getString("animal"),
-                data.getString("color"),
+                Integer.parseInt(data.getString("color").substring(1), 16),
                 data.getString("emoteId")
         );
     }
