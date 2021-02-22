@@ -39,6 +39,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -194,17 +195,19 @@ public class FanServerEventHandler implements EventListener {
     }
 
     private void handleBirthday(ZoneId zone) {
-        final Birthday birthday = this.database.getBirthday(LocalDate.now(zone));
+        final List<Birthday> birthdays = this.database.getBirthdays(LocalDate.now(zone));
 
-        if (birthday == null) {
+        if (birthdays.isEmpty()) {
             return;
         }
 
-        final int i = ThreadLocalRandom.current().nextInt(BDAY_MESSAGES.length);
+        for (final Birthday birthday : birthdays) {
+            final int i = ThreadLocalRandom.current().nextInt(BDAY_MESSAGES.length);
 
-        //noinspection ConstantConditions
-        this.hiro.jda.getTextChannelById(GENERAL_CHANNEL_ID)
-            .sendMessageFormat(BDAY_MESSAGES[i], birthday.getUserId())
-            .queue();
+            //noinspection ConstantConditions
+            this.hiro.jda.getTextChannelById(GENERAL_CHANNEL_ID)
+                .sendMessageFormat(BDAY_MESSAGES[i], birthday.getUserId())
+                .queue();
+        }
     }
 }

@@ -21,7 +21,6 @@ package me.duncte123.hirobot.database;
 import me.duncte123.hirobot.database.objects.Birthday;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -44,6 +43,5 @@ public interface Database {
 
     void removeBirthday(long userId);
 
-    @Nullable
-    Birthday getBirthday(LocalDate date);
+    List<Birthday> getBirthdays(LocalDate date);
 }

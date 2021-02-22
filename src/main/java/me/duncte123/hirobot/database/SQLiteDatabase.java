@@ -22,7 +22,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.duncte123.hirobot.database.objects.Birthday;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,9 +196,10 @@ public class SQLiteDatabase implements Database {
         }
     }
 
-    @Nullable
     @Override
-    public Birthday getBirthday(LocalDate date) {
+    public List<Birthday> getBirthdays(LocalDate date) {
+        final List<Birthday> birthdays = new ArrayList<>();
+
         try (final Connection conn = ds.getConnection()) {
             try (final PreparedStatement smt =
                      // language=SQLite
@@ -208,10 +208,10 @@ public class SQLiteDatabase implements Database {
 
                 try (final ResultSet resultSet = smt.executeQuery()) {
                     if (resultSet.next()) {
-                        return new Birthday(
+                        birthdays.add(new Birthday(
                             resultSet.getLong("user_id"),
                             resultSet.getString("date")
-                        );
+                        ));
                     }
                 }
             }
@@ -219,7 +219,7 @@ public class SQLiteDatabase implements Database {
             e.printStackTrace();
         }
 
-        return null;
+        return birthdays;
     }
 
     private String pre0(int in) {
