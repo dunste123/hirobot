@@ -207,7 +207,7 @@ public class SQLiteDatabase implements Database {
                 smt.setString(1, pre0(date.getMonthValue()) + '-' + pre0(date.getDayOfMonth()));
 
                 try (final ResultSet resultSet = smt.executeQuery()) {
-                    if (resultSet.next()) {
+                    while (resultSet.next()) {
                         birthdays.add(new Birthday(
                             resultSet.getLong("user_id"),
                             resultSet.getString("date")
