@@ -56,6 +56,7 @@ public class BdaysCommand extends Command {
                 addBday(event, split);
                 break;
             case "delete":
+            case "remove":
                 removeBday(event, split);
                 break;
             default:
@@ -96,7 +97,7 @@ public class BdaysCommand extends Command {
 
     private String mapBirthday(Birthday bday, JDA jda) {
         final User userById = jda.getUserById(bday.getUserId());
-        final String tag = userById == null ? "" : '`' + userById.getAsTag() + '`';
+        final String tag = userById == null ? "null" : '`' + userById.getAsTag() + '`';
 
         return "<@" + bday.getUserId() + "> " + tag + ": " + bday.getDate();
     }

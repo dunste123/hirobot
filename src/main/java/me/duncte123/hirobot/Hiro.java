@@ -48,6 +48,7 @@ public class Hiro {
     public static final long GENERAL_CHANNEL_ID = 670218976932134925L;
     public static final long ROLES_CHANNEL_ID = 672361818429325312L;
     public static final long DEV_CHANNEL_ID = 677954714825916427L;
+    public static final long STREAM_ROLE = 800299393982529546L;
     public final JDA jda;
     private static final Map<String, String> customEnv = new HashMap<>();
     private final Database database;
@@ -67,7 +68,8 @@ public class Hiro {
         builder.setHelpConsumer(this::helpConsumer);
 
         builder.addCommands(
-            new BdaysCommand(database)
+            new BdaysCommand(database),
+            new StreamAnnounceCommand()
         );
 
         final CommandClient commandClient = builder.build();

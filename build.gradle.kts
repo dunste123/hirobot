@@ -32,12 +32,14 @@ application {
 }
 
 repositories {
+    mavenCentral()
+    maven("https://m2.dv8tion.net/releases")
     jcenter()
 }
 
 dependencies {
-    implementation(group = "net.dv8tion", name = "JDA", version = "4.2.0_227")
-    implementation(group = "com.jagrosh", name = "jda-utilities-command", version = "3.0.4")
+    implementation(group = "net.dv8tion", name = "JDA", version = "4.2.1_254")
+    implementation(group = "com.jagrosh", name = "jda-utilities-command", version = "3.0.5")
     
     implementation(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.10.1")
 
