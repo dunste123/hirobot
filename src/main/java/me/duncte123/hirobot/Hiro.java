@@ -84,7 +84,7 @@ public class Hiro {
                 new FanServerEventHandler(this, database),
                 commandClient
             )
-            .setMemberCachePolicy(MemberCachePolicy.NONE)
+            .setMemberCachePolicy(MemberCachePolicy.PENDING)
             .disableCache(EnumSet.allOf(CacheFlag.class))
             .build();
 

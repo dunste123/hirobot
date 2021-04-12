@@ -26,7 +26,9 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdatePendingEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
@@ -89,6 +91,10 @@ public class FanServerEventHandler implements EventListener {
 
     @Override
     public void onEvent(@Nonnull GenericEvent event) {
+        if (event instanceof GenericGuildEvent && ((GenericGuildEvent) event).getGuild().getIdLong() != FAN_GUILD_ID) {
+            return;
+        }
+
         if (event instanceof ReadyEvent) {
             this.onReady((ReadyEvent) event);
         } else if (event instanceof GuildMemberJoinEvent) {
@@ -99,6 +105,8 @@ public class FanServerEventHandler implements EventListener {
             this.onGuildMessageReactionAdd((GuildMessageReactionAddEvent) event);
         } else if (event instanceof GuildMessageReactionRemoveEvent) {
             this.onGuildMessageReactionRemove((GuildMessageReactionRemoveEvent) event);
+        } else if (event instanceof GuildMemberUpdatePendingEvent) {
+            this.onGuildMemberUpdatePending((GuildMemberUpdatePendingEvent) event);
         }
     }
 
@@ -116,7 +124,7 @@ public class FanServerEventHandler implements EventListener {
     private void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
         final Guild guild = event.getGuild();
 
-        if (guild.getIdLong() != FAN_GUILD_ID || event.getChannel().getIdLong() != ROLES_CHANNEL_ID) {
+        if (event.getChannel().getIdLong() != ROLES_CHANNEL_ID) {
             return;
         }
 
@@ -128,7 +136,7 @@ public class FanServerEventHandler implements EventListener {
     private void onGuildMessageReactionRemove(@Nonnull GuildMessageReactionRemoveEvent event) {
         final Guild guild = event.getGuild();
 
-        if (guild.getIdLong() != FAN_GUILD_ID || event.getChannel().getIdLong() != ROLES_CHANNEL_ID) {
+        if (event.getChannel().getIdLong() != ROLES_CHANNEL_ID) {
             return;
         }
 
@@ -138,22 +146,11 @@ public class FanServerEventHandler implements EventListener {
     }
 
     private void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        final Guild guild = event.getGuild();
+        triggerMemberWelcome(event.getMember());
+    }
 
-        if (guild.getIdLong() != FAN_GUILD_ID) {
-            return;
-        }
-
-        final Role stansRole = Objects.requireNonNull(guild.getRoleById(STANS_ROLE_ID));
-        final Member member = event.getMember();
-        final TextChannel channel = Objects.requireNonNull(guild.getTextChannelById(GENERAL_CHANNEL_ID));
-        final int i = ThreadLocalRandom.current().nextInt(WELCOME_MESSAGES.length);
-
-        channel.sendMessage(
-                WELCOME_MESSAGES[i].replace("{user}", member.getUser().getAsMention())
-        ).queue();
-
-        guild.addRoleToMember(member, stansRole).queue();
+    private void onGuildMemberUpdatePending(@Nonnull GuildMemberUpdatePendingEvent event) {
+        triggerMemberWelcome(event.getMember());
     }
 
     private void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
@@ -209,5 +206,22 @@ public class FanServerEventHandler implements EventListener {
                 .sendMessageFormat(BDAY_MESSAGES[i], birthday.getUserId())
                 .queue();
         }
+    }
+
+    private void triggerMemberWelcome(Member member) {
+        if (member.isPending()) {
+            return;
+        }
+
+        final Guild guild = member.getGuild();
+        final Role stansRole = Objects.requireNonNull(guild.getRoleById(STANS_ROLE_ID));
+        final TextChannel channel = Objects.requireNonNull(guild.getTextChannelById(GENERAL_CHANNEL_ID));
+        final int i = ThreadLocalRandom.current().nextInt(WELCOME_MESSAGES.length);
+
+        channel.sendMessage(
+            WELCOME_MESSAGES[i].replace("{user}", member.getUser().getAsMention())
+        ).queue();
+
+        guild.addRoleToMember(member, stansRole).queue();
     }
 }
