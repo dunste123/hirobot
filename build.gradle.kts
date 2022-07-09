@@ -21,14 +21,14 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType
 plugins {
     java
     application
-    id("com.github.johnrengelman.shadow") version("5.0.0")
+    id("com.github.johnrengelman.shadow") version("7.1.2")
 }
 
 group = "me.duncte123"
 version = "1.0-SNAPSHOT"
 
 application {
-    mainClassName = "$group.hirobot.Hiro"
+    mainClass.set("$group.hirobot.Hiro")
 }
 
 repositories {
@@ -57,11 +57,11 @@ tasks.withType<JavaCompile> {
     options.compilerArgs = listOf("-Xlint:deprecation", "-Xlint:unchecked")
 }
 
-configure<JavaPluginConvention> {
+configure<JavaPluginExtension> {
     sourceCompatibility = JavaVersion.VERSION_11
 }
 
 tasks.withType<Wrapper> {
     distributionType = DistributionType.ALL
-    gradleVersion = "6.8"
+    gradleVersion = "7.4.2"
 }

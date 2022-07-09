@@ -5,3 +5,4 @@ out/
 !.idea/copyright/hirobot.xml
 !.idea/copyright/profiles_settings.xml
 .env
+docker-compose.override.yml

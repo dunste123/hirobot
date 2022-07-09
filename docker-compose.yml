@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+    hiro:
+        container_name: hiro
+        build:
+            context: .
+        environment:
+            - TOKEN=
+        volumes:
+            -   ./data:/hirobot/data

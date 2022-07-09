@@ -135,7 +135,7 @@ public class Hiro {
     }
 
     private static Map<String, String> loadEnvironment() throws IOException {
-        final Map<String, String> env = new HashMap<>();
+        /*final Map<String, String> env = new HashMap<>();
         final List<String> lines = Files.readAllLines(new File(".env").toPath());
 
         for (String line : lines) {
@@ -147,8 +147,8 @@ public class Hiro {
             final String[] kv = line.split("=");
 
             env.put(kv[0], kv[1]);
-        }
+        }*/
 
-        return env;
+        return System.getenv();
     }
 }
